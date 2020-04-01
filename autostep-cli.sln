@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29911.84
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4766E245-A166-45FC-B72A-60DD25ED1BDA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autostep-cli", "src\autostep\autostep-cli.csproj", "{44CBC89B-2F54-410C-9940-492A61E593D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0CD4927F-A894-4E88-BB17-4F955CB27B93}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		build.ps1 = build.ps1
+		LICENSE = LICENSE
+		NuGet.config = NuGet.config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x64.Build.0 = Debug|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x86.Build.0 = Debug|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x64.ActiveCfg = Release|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x64.Build.0 = Release|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x86.ActiveCfg = Release|Any CPU
+		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{44CBC89B-2F54-410C-9940-492A61E593D3} = {4766E245-A166-45FC-B72A-60DD25ED1BDA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65016CD9-4154-40F4-92D5-CDB5C91A5BBC}
+	EndGlobalSection
+EndGlobal

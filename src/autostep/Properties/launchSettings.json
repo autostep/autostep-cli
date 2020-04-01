@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "autostep-cli": {
+      "commandName": "Project",
+      "commandLineArgs": "run -d D:\\TestingAutoStep"
+    }
+  }
+}
