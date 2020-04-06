@@ -3,17 +3,20 @@ using System;
 using System.Collections.Concurrent;
 using System.CommandLine;
 using System.CommandLine.IO;
+using System.CommandLine.Rendering;
 
 namespace AutoStep.CommandLine
 {
     internal class ConsoleLoggerProvider : ILoggerProvider
     {
         private readonly IConsole console;
+        private readonly ITerminal terminal;
         private readonly ConcurrentDictionary<string, ILogger> loggers = new ConcurrentDictionary<string, ILogger>();
 
         public ConsoleLoggerProvider(IConsole console)
         {
             this.console = console;
+            this.terminal = console as ITerminal;
         }
 
         public ILogger CreateLogger(string categoryName)
@@ -23,11 +26,19 @@ namespace AutoStep.CommandLine
 
         public void Log<TState>(string name, LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if (logLevel >= LogLevel.Error)
-            {
-                console.Error.WriteLine(formatter(state, exception));
+            if (logLevel >= LogLevel.Error && terminal is object)
+            {   
+                terminal.ForegroundColor = ConsoleColor.Red;
+                terminal.Out.WriteLine(formatter(state, exception));
+                terminal.ResetColor();
             }
-            else 
+            else if(logLevel >= LogLevel.Warning && terminal is object)
+            {
+                terminal.ForegroundColor = ConsoleColor.DarkYellow;
+                terminal.Out.WriteLine(formatter(state, exception));
+                terminal.ResetColor();
+            }
+            else
             {
                 console.Out.WriteLine(formatter(state, exception));
             }
