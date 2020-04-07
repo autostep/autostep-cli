@@ -2,7 +2,7 @@
   "profiles": {
     "autostep-cli": {
       "commandName": "Project",
-      "commandLineArgs": "run -d D:\\TestingAutoStep"
+      "commandLineArgs": "run -d D:\\TestingAutoStep -o run.value=value1 run.other=value2 -o run.same"
     }
   }
 }

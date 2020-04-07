@@ -1,6 +1,7 @@
 ﻿using AutoStep.Projects.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
@@ -66,9 +67,50 @@ namespace AutoStep.CommandLine
                 Argument = new Argument<FileInfo>(() => null).ExistingOnly()
             });
 
+            Add(new Option(new[] { "-o", "--option" }, "Specify key/value pairs to override project configuration settings.")
+            {
+                Argument = new Argument<IReadOnlyList<KeyValuePair<string, string>>>(ParseKeyValuePairs)
+            });
+
             Add(new Option(new[] { "-v", "--verbose" }, "Enable verbose execution, providing more execution detail."));
 
             Add(new Option(new[] { "--diagnostic" }, "Enables diagnostic verbosity level, providing internal execution details."));
+        }
+
+        private IReadOnlyList<KeyValuePair<string, string>> ParseKeyValuePairs(ArgumentResult parsed)
+        {
+            var list = new List<KeyValuePair<string, string>>();
+
+            foreach (var item in parsed.Tokens)
+            {
+                if (item.Type == TokenType.Argument)
+                {
+                    // Split in two on the equals sign. If only 1 side, then assume boolean true.
+                    var splitValue = item.Value.Split('=', 2);
+
+                    var key = splitValue[0];
+                    
+                    if(string.IsNullOrEmpty(key))
+                    {
+                        // Can't have an empty key.
+                        parsed.ErrorMessage = string.Format("Cannot have an empty key value for an option argument: '{0}'", item.Value);
+                        continue;
+                    }
+
+                    if (splitValue.Length > 1)
+                    {
+                        // Providing a value.
+                        list.Add(new KeyValuePair<string, string>(key, splitValue[1]));
+                    }
+                    else 
+                    {
+                        // Boolean true.
+                        list.Add(new KeyValuePair<string, string>(key, true.ToString()));
+                    }
+                }
+            }
+
+            return list;
         }
     }
 }

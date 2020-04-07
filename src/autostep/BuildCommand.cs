@@ -21,7 +21,7 @@ namespace AutoStep.CommandLine
 
             try
             {
-                var projectConfig = await GetConfiguration(args, cancelToken);
+                var projectConfig = GetConfiguration(args);
 
                 using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, cancelToken);
 

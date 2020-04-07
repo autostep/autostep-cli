@@ -5,10 +5,12 @@ using AutoStep.Language.Test;
 using AutoStep.Projects;
 using AutoStep.Projects.Configuration;
 using AutoStep.Projects.Files;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,9 +23,9 @@ namespace AutoStep.CommandLine
         {
         }
 
-        protected async Task<ProjectConfiguration> GetConfiguration(BaseProjectArgs args, CancellationToken cancelToken)
+        protected IConfiguration GetConfiguration(BaseProjectArgs args)
         {
-            ProjectConfiguration config = ProjectConfiguration.Default;
+            var configurationBuilder = new ConfigurationBuilder();
 
             var configFile = args.Config;
 
@@ -35,15 +37,20 @@ namespace AutoStep.CommandLine
             // Is there a config file?
             if (configFile.Exists)
             {
-                // Load the configuration file.
-                // Deserialize from JSON.
-                config = await LoadConfiguration(configFile, cancelToken);
+                // Add the JSON file.
+                configurationBuilder.AddJsonFile(configFile.FullName);
             }
 
-            return config;
+            // Add environment.
+            configurationBuilder.AddEnvironmentVariables("AutoStep");
+
+            // Add the provided command line options.
+            configurationBuilder.AddInMemoryCollection(args.Option);
+
+            return configurationBuilder.Build();
         }
 
-        protected Project CreateProject(BaseProjectArgs args, ProjectConfiguration projectConfig, LoadedExtensionSet extensions)
+        protected Project CreateProject(BaseProjectArgs args, IConfiguration projectConfig, IExtensionSet extensions)
         {
             // Create the project.
             Project project;
@@ -58,7 +65,7 @@ namespace AutoStep.CommandLine
             }
 
             // Let our extensions extend the project.
-            extensions.AttachToProject(project);
+            extensions.AttachToProject(projectConfig, project);
 
             // Add any files from extension content.
             // Treat the extension directory as a single file set (one for interactions, one for test).
@@ -69,8 +76,8 @@ namespace AutoStep.CommandLine
             project.MergeTestFileSet(extTestFiles);
 
             // Define file sets for interaction and test.
-            var interactionFiles = FileSet.Create(args.Directory.FullName, projectConfig.Interactions, new string[] { ".autostep/**" });
-            var testFiles = FileSet.Create(args.Directory.FullName, projectConfig.Tests, new string[] { ".autostep/**" });
+            var interactionFiles = FileSet.Create(args.Directory.FullName, projectConfig.GetInteractionFileGlobs(), new string[] { ".autostep/**" });
+            var testFiles = FileSet.Create(args.Directory.FullName, projectConfig.GetTestFileGlobs(), new string[] { ".autostep/**" });
 
             // Add the two file sets.
             project.MergeInteractionFileSet(interactionFiles);
@@ -123,28 +130,21 @@ namespace AutoStep.CommandLine
             }
         }
 
-        protected async Task<LoadedExtensionSet> LoadExtensionsAsync(BaseProjectArgs projectArgs, ILoggerFactory logFactory, ProjectConfiguration projectConfig, CancellationToken cancelToken)
+        protected async Task<IExtensionSet> LoadExtensionsAsync(BaseProjectArgs projectArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
         {
-            var extensionsFolder = Path.GetFullPath(Path.Combine(".autostep", "extensions"), projectArgs.Directory.FullName);
+            var sourceSettings = new ExtensionSourceSettings(projectArgs.Directory.FullName);
 
-            var depFilePath = Path.Combine(extensionsFolder, "extensions.deps.json");
+            var customSources = projectConfig.GetSection("extensionSources").Get<string[]>() ?? Array.Empty<string>();
 
-            var cachedLoader = new CachedExtensionLoader(projectArgs, extensionsFolder, logFactory);
-
-            var resolved = await cachedLoader.ResolveExtensionPackagesAsync(projectConfig, depFilePath, cancelToken);
-
-            if (resolved is null)
+            if (customSources.Length > 0)
             {
-                using var nugetLoader = new NugetExtensionLoader(projectArgs, extensionsFolder, logFactory);
-
-                resolved = await nugetLoader.ResolveExtensionPackagesAsync(projectConfig, depFilePath, cancelToken);
+                // Add any additional configured sources.
+                sourceSettings.AppendCustomSources(customSources);
             }
 
-            var loadedSet = new LoadedExtensionSet(projectConfig, resolved);
+            var loaded = await ExtensionSetLoader.LoadExtensionsAsync(projectArgs.Directory.FullName, Assembly.GetEntryAssembly(), sourceSettings, logFactory, projectConfig, cancelToken);
 
-            loadedSet.Load(logFactory);
-
-            return loadedSet;
+            return loaded;
         }
 
         protected async ValueTask<ProjectCompilerResult> CompileAsync(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
@@ -156,11 +156,6 @@ namespace AutoStep.CommandLine
         protected ProjectCompilerResult Link(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
         {
             return project.Compiler.Link(cancelToken);
-        }
-
-        protected ValueTask<ProjectConfiguration> LoadConfiguration(FileInfo file, CancellationToken cancelToken)
-        {
-            return ProjectConfiguration.Load(file.FullName, cancelToken);
         }
     }
 }
