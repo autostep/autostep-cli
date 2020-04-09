@@ -2,6 +2,19 @@
 
 Command Line Interface for [AutoStep BDD](https://github.com/autostep/AutoStep).
 
+> [Contribution Guide](https://github.com/autostep/.github/blob/master/CONTRIBUTING.md) and
+> [Code of Conduct](https://github.com/autostep/.github/blob/master/CODE_OF_CONDUCT.md)
+
+---
+
+**Status**
+
+AutoStep is currently under development (in alpha).
+
+We will be creating a chocolatey package for the CLI shortly.
+
+---
+
 Some example usages:
 
 **Getting Help**

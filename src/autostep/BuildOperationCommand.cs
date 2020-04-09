@@ -3,7 +3,6 @@ using AutoStep.Language;
 using AutoStep.Language.Interaction;
 using AutoStep.Language.Test;
 using AutoStep.Projects;
-using AutoStep.Projects.Configuration;
 using AutoStep.Projects.Files;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
