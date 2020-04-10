@@ -87,6 +87,10 @@ namespace AutoStep.CommandLine
 
         protected async Task<bool> BuildAndWriteResultsAsync(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
         {
+            var logger = logFactory.CreateLogger("build");
+
+            logger.LogInformation("Compiling Project.");
+
             // Execution.
             var compiled = await CompileAsync(args, project, logFactory, cancelToken);
 
@@ -97,14 +101,26 @@ namespace AutoStep.CommandLine
 
             if (compiled.Messages.Any(m => m.Level == CompilerMessageLevel.Error))
             {
+                logger.LogWarning("Compilation failed with one or more errors.");
                 success = false;
             }
+            else
+            {
+                logger.LogInformation("Compiled successfully.");
+            }
+
+            logger.LogInformation("Binding Steps.");
 
             var linked = Link(args, project, logFactory, cancelToken);
 
             if (success && linked.Messages.Any(m => m.Level == CompilerMessageLevel.Error))
             {
+                logger.LogWarning("Step binding failed with one or more errors.");
                 success = false;
+            }
+            else
+            {
+                logger.LogInformation("All steps bound successfully.");
             }
 
             // Write link result.
@@ -141,7 +157,7 @@ namespace AutoStep.CommandLine
                 sourceSettings.AppendCustomSources(customSources);
             }
 
-            var loaded = await ExtensionSetLoader.LoadExtensionsAsync(projectArgs.Directory.FullName, Assembly.GetEntryAssembly(), sourceSettings, logFactory, projectConfig, cancelToken);
+            var loaded = await ExtensionSetLoader.LoadExtensionsAsync(projectArgs.Directory.FullName, sourceSettings, logFactory, projectConfig, cancelToken);
 
             return loaded;
         }

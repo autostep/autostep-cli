@@ -1,4 +1,7 @@
-﻿using AutoStep.Projects.Configuration;
+﻿using AutoStep.Extensions;
+using AutoStep.Projects;
+using AutoStep.Projects.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Runtime.InteropServices;
@@ -25,17 +28,21 @@ namespace AutoStep.CommandLine
 
                 using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, cancelToken);
 
-                var project = CreateProject(args, projectConfig, extensions);
-
-                success = await BuildAndWriteResultsAsync(args, project, logFactory, cancelToken);
-
-            } 
+                success = await CreateAndBuildProject(args, projectConfig, logFactory, extensions, cancelToken);
+            }
             catch (ProjectConfigurationException configEx)
             {
                 LogConfigurationError(logger, configEx);
             }
 
             return success ? 0 : 1;
+        }
+
+        private async Task<bool> CreateAndBuildProject(BuildOperationArgs args, IConfiguration projectConfig, ILoggerFactory logFactory, IExtensionSet extensions, CancellationToken cancelToken)
+        {
+            var project = CreateProject(args, projectConfig, extensions);
+
+            return await BuildAndWriteResultsAsync(args, project, logFactory, cancelToken);
         }
     }
 }
