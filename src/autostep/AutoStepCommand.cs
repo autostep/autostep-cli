@@ -1,18 +1,19 @@
-﻿using AutoStep.Projects.Configuration;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace AutoStep.CommandLine
 {
+    /// <summary>
+    /// Base class for all autostep CLI commands.
+    /// </summary>
+    /// <typeparam name="TArgs">The argument type (that is bound to the command line options).</typeparam>
     public abstract class AutoStepCommand<TArgs> : Command
         where TArgs : BaseGlobalArgs
     {

@@ -163,7 +163,7 @@ namespace AutoStep.CommandLine
         }
 
         protected async ValueTask<ProjectCompilerResult> CompileAsync(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
-        {            
+        {
             // Now, compile.
             return await project.Compiler.CompileAsync(logFactory, cancelToken);
         }

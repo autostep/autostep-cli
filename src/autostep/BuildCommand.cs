@@ -1,12 +1,8 @@
-﻿using AutoStep.Extensions;
-using AutoStep.Projects;
-using AutoStep.Projects.Configuration;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AutoStep.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AutoStep.CommandLine
 {

@@ -1,8 +1,4 @@
-﻿using AutoStep.Projects.Configuration;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace AutoStep.CommandLine
 {
@@ -12,7 +8,7 @@ namespace AutoStep.CommandLine
         {
             return config.GetValue("tests", new[] { "**/*.as" });
         }
-        
+
         public static string[] GetInteractionFileGlobs(this IConfiguration config)
         {
             return config.GetValue("interactions", new[] { "**/*.asi" });

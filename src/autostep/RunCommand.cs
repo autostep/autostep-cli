@@ -1,12 +1,10 @@
-﻿using AutoStep.Execution;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AutoStep.CommandLine.Results;
 using AutoStep.Extensions;
 using AutoStep.Extensions.Abstractions;
-using AutoStep.Projects;
-using AutoStep.Projects.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AutoStep.CommandLine
 {
@@ -45,14 +43,19 @@ namespace AutoStep.CommandLine
                 // No errors, run.
                 var testRun = project.CreateTestRun(projectConfig);
 
+                testRun.Events.Add(new CommandLineResultsCollector());
+
                 // Allow extensions to extend the execution behaviour.
                 extensions.ExtendExecution(projectConfig, testRun);
 
                 // Execute the test run, allowing extensions to register their own services.
                 await testRun.ExecuteAsync(logFactory, (runConfig, builder) =>
                 {
+                    // Register the console provider.
+                    builder.RegisterInstance<IConsoleResultsWriter>(new ConsoleResultsWriter(logFactory));
+
                     // Register the extension set (might need it later).
-                    builder.RegisterSingleInstance<ILoadedExtensions>(extensions);
+                    builder.RegisterInstance<ILoadedExtensions>(extensions);
 
                     extensions.ConfigureExtensionServices(runConfig, builder);
                 });
