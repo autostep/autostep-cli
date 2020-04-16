@@ -1,4 +1,5 @@
 ﻿using AutoStep.Extensions;
+using AutoStep.Extensions.Abstractions;
 using AutoStep.Language;
 using AutoStep.Language.Interaction;
 using AutoStep.Language.Test;
@@ -49,14 +50,14 @@ namespace AutoStep.CommandLine
             return configurationBuilder.Build();
         }
 
-        protected Project CreateProject(BaseProjectArgs args, IConfiguration projectConfig, IExtensionSet extensions)
+        protected Project CreateProject(BaseProjectArgs args, IConfiguration projectConfig, ILoadedExtensions<IExtensionEntryPoint> extensions)
         {
             // Create the project.
             Project project;
 
             if (args.Diagnostic)
             {
-                project = new Project(p => ProjectCompiler.CreateWithOptions(p, TestCompilerOptions.EnableDiagnostics, InteractionsCompilerOptions.EnableDiagnostics));
+                project = new Project(p => ProjectCompiler.CreateWithOptions(p, TestCompilerOptions.EnableDiagnostics, InteractionsCompilerOptions.EnableDiagnostics, false));
             }
             else
             {
@@ -64,7 +65,10 @@ namespace AutoStep.CommandLine
             }
 
             // Let our extensions extend the project.
-            extensions.AttachToProject(projectConfig, project);
+            foreach (var ext in extensions.ExtensionEntryPoints)
+            {
+                ext.AttachToProject(projectConfig, project);
+            }
 
             // Add any files from extension content.
             // Treat the extension directory as a single file set (one for interactions, one for test).
@@ -145,9 +149,9 @@ namespace AutoStep.CommandLine
             }
         }
 
-        protected async Task<IExtensionSet> LoadExtensionsAsync(BaseProjectArgs projectArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
+        protected async Task<ILoadedExtensions<IExtensionEntryPoint>> LoadExtensionsAsync(BaseProjectArgs projectArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
         {
-            var sourceSettings = new ExtensionSourceSettings(projectArgs.Directory.FullName);
+            var sourceSettings = new SourceSettings(projectArgs.Directory.FullName);
 
             var customSources = projectConfig.GetSection("extensionSources").Get<string[]>() ?? Array.Empty<string>();
 
@@ -157,7 +161,10 @@ namespace AutoStep.CommandLine
                 sourceSettings.AppendCustomSources(customSources);
             }
 
-            var loaded = await ExtensionSetLoader.LoadExtensionsAsync(projectArgs.Directory.FullName, sourceSettings, logFactory, projectConfig, cancelToken);
+            var extensionsDir = Path.Combine(projectArgs.Directory.FullName, ".autostep", "extensions");
+            var setLoader = new ExtensionSetLoader(extensionsDir, logFactory, "autostep");
+
+            var loaded = await setLoader.LoadExtensionsAsync<IExtensionEntryPoint>(sourceSettings, projectConfig.GetExtensionConfiguration(), false, cancelToken);
 
             return loaded;
         }

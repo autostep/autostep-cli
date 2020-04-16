@@ -34,7 +34,7 @@ namespace AutoStep.CommandLine
             return 1;
         }
 
-        private async Task<int> CreateAndExecuteProject(RunArgs args, ILoggerFactory logFactory, IConfiguration projectConfig, IExtensionSet extensions, CancellationToken cancelToken)
+        private async Task<int> CreateAndExecuteProject(RunArgs args, ILoggerFactory logFactory, IConfiguration projectConfig, ILoadedExtensions<IExtensionEntryPoint> extensions, CancellationToken cancelToken)
         {
             var project = CreateProject(args, projectConfig, extensions);
 
@@ -45,8 +45,11 @@ namespace AutoStep.CommandLine
 
                 testRun.Events.Add(new CommandLineResultsCollector());
 
-                // Allow extensions to extend the execution behaviour.
-                extensions.ExtendExecution(projectConfig, testRun);
+                foreach (var ext in extensions.ExtensionEntryPoints)
+                {
+                    // Allow extensions to extend the execution behaviour.
+                    ext.ExtendExecution(projectConfig, testRun);
+                }
 
                 // Execute the test run, allowing extensions to register their own services.
                 await testRun.ExecuteAsync(logFactory, (runConfig, builder) =>
@@ -57,7 +60,10 @@ namespace AutoStep.CommandLine
                     // Register the extension set (might need it later).
                     builder.RegisterInstance<ILoadedExtensions>(extensions);
 
-                    extensions.ConfigureExtensionServices(runConfig, builder);
+                    foreach (var ext in extensions.ExtensionEntryPoints)
+                    {
+                        ext.ConfigureExecutionServices(runConfig, builder);
+                    }
                 });
 
                 return 0;
@@ -65,6 +71,5 @@ namespace AutoStep.CommandLine
 
             return 1;
         }
-
     }
 }
