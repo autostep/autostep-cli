@@ -52,7 +52,7 @@ namespace AutoStep.CommandLine
                 }
 
                 // Execute the test run, allowing extensions to register their own services.
-                await testRun.ExecuteAsync(logFactory, (runConfig, builder) =>
+                await testRun.ExecuteAsync(logFactory, cancelToken, (runConfig, builder) =>
                 {
                     // Register the console provider.
                     builder.RegisterInstance<IConsoleResultsWriter>(new ConsoleResultsWriter(logFactory));

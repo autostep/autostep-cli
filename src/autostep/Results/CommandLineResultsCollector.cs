@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.Execution;
 using AutoStep.Execution.Contexts;
@@ -9,36 +10,36 @@ namespace AutoStep.CommandLine.Results
 {
     public class CommandLineResultsCollector : BaseEventHandler
     {
-        public override async ValueTask OnExecute(IServiceProvider scope, RunContext ctxt, Func<IServiceProvider, RunContext, ValueTask> nextHandler)
+        public override async ValueTask OnExecuteAsync(IServiceProvider scope, RunContext ctxt, Func<IServiceProvider, RunContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var writer = GetConsoleWriter(scope);
 
             writer.WriteInfo("Test Run Starting");
 
-            await nextHandler(scope, ctxt);
+            await nextHandler(scope, ctxt, cancelToken);
 
             // Finished.
             writer.WriteInfo("Test Run Complete");
         }
 
-        public override async ValueTask OnFeature(IServiceProvider scope, FeatureContext ctxt, Func<IServiceProvider, FeatureContext, ValueTask> nextHandler)
+        public override async ValueTask OnFeatureAsync(IServiceProvider scope, FeatureContext ctxt, Func<IServiceProvider, FeatureContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var writer = GetConsoleWriter(scope);
 
             writer.WriteInfo($"Starting Feature: {ctxt.Feature.Name}");
 
-            await nextHandler(scope, ctxt);
+            await nextHandler(scope, ctxt, cancelToken);
 
             writer.WriteInfo($"Completed Feature");
         }
 
-        public override async ValueTask OnScenario(IServiceProvider scope, ScenarioContext ctxt, Func<IServiceProvider, ScenarioContext, ValueTask> nextHandler)
+        public override async ValueTask OnScenarioAsync(IServiceProvider scope, ScenarioContext ctxt, Func<IServiceProvider, ScenarioContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var writer = GetConsoleWriter(scope);
 
             writer.WriteInfo($"Starting Scenario: {ctxt.Scenario.Name}");
 
-            await nextHandler(scope, ctxt);
+            await nextHandler(scope, ctxt, cancelToken);
 
             if (ctxt.FailException is object)
             {
