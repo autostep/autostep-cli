@@ -16,7 +16,7 @@ namespace AutoStep.CommandLine
     /// Base class for all autostep CLI commands.
     /// </summary>
     /// <typeparam name="TArgs">The argument type (that is bound to the command line options).</typeparam>
-    internal abstract class AutoStepCommand<TArgs> : Command
+    internal abstract class AutoStepCommand<TArgs> : Command, IAutostepCommand
         where TArgs : BaseGlobalArgs
     {
         /// <summary>
@@ -34,6 +34,15 @@ namespace AutoStep.CommandLine
                 using var logFactory = GetLoggerFactory(args, con);
                 return await Execute(args, GetLoggerFactory(args, con), token);
             });
+        }
+
+        /// <summary>
+        /// Method to check if the command invoked is valid.
+        /// </summary>
+        /// <returns>true if the command is valid, else false.</returns>
+        public virtual bool CommandIsValid()
+        {
+            return true;
         }
 
         /// <summary>
@@ -106,11 +115,6 @@ namespace AutoStep.CommandLine
 
         private void AddCommonOptions()
         {
-            Add(new Option(new[] { "-d", "--directory" }, "Provide the base directory for the autostep project.")
-            {
-                Argument = new Argument<DirectoryInfo>(() => new DirectoryInfo(Environment.CurrentDirectory)).ExistingOnly(),
-            });
-
             Add(new Option(new[] { "-c", "--config" }, "Specify the autostep configuration file.")
             {
                 Argument = new Argument<FileInfo?>(() => null).ExistingOnly(),
