@@ -32,7 +32,7 @@ namespace AutoStep.CommandLine
             Handler = CommandHandler.Create(async (TArgs args, IConsole con, CancellationToken token) =>
             {
                 using var logFactory = GetLoggerFactory(args, con);
-                return await Execute(args, GetLoggerFactory(args, con), token);
+                return await Execute(args, logFactory, token);
             });
         }
 
