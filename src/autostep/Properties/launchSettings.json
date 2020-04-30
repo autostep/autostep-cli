@@ -2,7 +2,7 @@
   "profiles": {
     "autostep-cli": {
       "commandName": "Project",
-      "commandLineArgs": "run -d D:\\TestingAutoStep"
+      "commandLineArgs": "build -d C:\\Work\\GitHub\\AutoStep.Web\\tests\\AutoStepTests --attach"
     }
   }
 }

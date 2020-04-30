@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.CommandLine.Results;
 using AutoStep.Extensions;
@@ -24,6 +25,11 @@ namespace AutoStep.CommandLine
 
                 using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, cancelToken);
 
+                if (args.Attach)
+                {
+                    Debugger.Launch();
+                }
+
                 return await CreateAndExecuteProject(args, logFactory, projectConfig, extensions, cancelToken);
             }
             catch (ProjectConfigurationException projectConfigEx)
@@ -34,7 +40,7 @@ namespace AutoStep.CommandLine
             return 1;
         }
 
-        private async Task<int> CreateAndExecuteProject(RunArgs args, ILoggerFactory logFactory, IConfiguration projectConfig, ILoadedExtensions<IExtensionEntryPoint> extensions, CancellationToken cancelToken)
+        private async Task<int> CreateAndExecuteProject(RunArgs args, ILoggerFactory logFactory, IConfiguration projectConfig, ExtensionsContext extensions, CancellationToken cancelToken)
         {
             var project = CreateProject(args, projectConfig, extensions);
 
@@ -45,7 +51,7 @@ namespace AutoStep.CommandLine
 
                 testRun.Events.Add(new CommandLineResultsCollector());
 
-                foreach (var ext in extensions.ExtensionEntryPoints)
+                foreach (var ext in extensions.LoadedExtensions.ExtensionEntryPoints)
                 {
                     // Allow extensions to extend the execution behaviour.
                     ext.ExtendExecution(projectConfig, testRun);
@@ -58,9 +64,9 @@ namespace AutoStep.CommandLine
                     builder.RegisterInstance<IConsoleResultsWriter>(new ConsoleResultsWriter(logFactory));
 
                     // Register the extension set (might need it later).
-                    builder.RegisterInstance<ILoadedExtensions>(extensions);
+                    builder.RegisterInstance<ILoadedExtensions>(extensions.LoadedExtensions);
 
-                    foreach (var ext in extensions.ExtensionEntryPoints)
+                    foreach (var ext in extensions.LoadedExtensions.ExtensionEntryPoints)
                     {
                         ext.ConfigureExecutionServices(runConfig, builder);
                     }

@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.Extensions;
 using AutoStep.Extensions.Abstractions;
@@ -25,7 +27,23 @@ namespace AutoStep.CommandLine
 
                 using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, cancelToken);
 
+                if (args.Attach)
+                {
+                    Debugger.Launch();
+                }
+
                 success = await CreateAndBuildProject(args, projectConfig, logFactory, extensions, cancelToken);
+            }
+            catch (ExtensionLoadException ex)
+            {
+                logger.LogError(ex.Message);
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var nestedEx in ex.InnerExceptions)
+                {
+                    logger.LogError(nestedEx.Message);
+                }
             }
             catch (ProjectConfigurationException configEx)
             {
@@ -35,7 +53,7 @@ namespace AutoStep.CommandLine
             return success ? 0 : 1;
         }
 
-        private async Task<bool> CreateAndBuildProject(BuildOperationArgs args, IConfiguration projectConfig, ILoggerFactory logFactory, ILoadedExtensions<IExtensionEntryPoint> extensions, CancellationToken cancelToken)
+        private async Task<bool> CreateAndBuildProject(BuildOperationArgs args, IConfiguration projectConfig, ILoggerFactory logFactory, ExtensionsContext extensions, CancellationToken cancelToken)
         {
             var project = CreateProject(args, projectConfig, extensions);
 

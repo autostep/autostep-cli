@@ -1,5 +1,11 @@
-﻿using AutoStep.Extensions;
-using AutoStep.Extensions.Abstractions;
+﻿using System;
+using System.CommandLine;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoStep.Extensions;
 using AutoStep.Language;
 using AutoStep.Language.Interaction;
 using AutoStep.Language.Test;
@@ -7,12 +13,6 @@ using AutoStep.Projects;
 using AutoStep.Projects.Files;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AutoStep.CommandLine
 {
@@ -21,6 +21,7 @@ namespace AutoStep.CommandLine
     {
         public BuildOperationCommand(string name, string description = null) : base(name, description)
         {
+            Add(new Option(new[] { "--attach" }, "Prompts for a debugger prior to project build."));
         }
 
         protected IConfiguration GetConfiguration(BaseProjectArgs args)
@@ -29,7 +30,7 @@ namespace AutoStep.CommandLine
 
             var configFile = args.Config;
 
-            if(configFile is null)
+            if (configFile is null)
             {
                 configFile = new FileInfo(Path.Combine(args.Directory.FullName, "autostep.config.json"));
             }
@@ -50,11 +51,12 @@ namespace AutoStep.CommandLine
             return configurationBuilder.Build();
         }
 
-        protected Project CreateProject(BaseProjectArgs args, IConfiguration projectConfig, ILoadedExtensions<IExtensionEntryPoint> extensions)
+        protected Project CreateProject(BaseProjectArgs args, IConfiguration projectConfig, ExtensionsContext extensions)
         {
             // Create the project.
             Project project;
 
+            // At this point, launch the debugger.
             if (args.Diagnostic)
             {
                 project = new Project(p => ProjectCompiler.CreateWithOptions(p, TestCompilerOptions.EnableDiagnostics, InteractionsCompilerOptions.EnableDiagnostics, false));
@@ -65,15 +67,15 @@ namespace AutoStep.CommandLine
             }
 
             // Let our extensions extend the project.
-            foreach (var ext in extensions.ExtensionEntryPoints)
+            foreach (var ext in extensions.LoadedExtensions.ExtensionEntryPoints)
             {
                 ext.AttachToProject(projectConfig, project);
             }
 
             // Add any files from extension content.
             // Treat the extension directory as a single file set (one for interactions, one for test).
-            var extInteractionFiles = FileSet.Create(extensions.ExtensionsRootDir, new string[] { "*/content/**/*.asi" });
-            var extTestFiles = FileSet.Create(extensions.ExtensionsRootDir, new string[] { "*/content/**/*.as" });
+            var extInteractionFiles = FileSet.Create(extensions.ExtensionRootDirectory, new string[] { "*/content/**/*.asi" });
+            var extTestFiles = FileSet.Create(extensions.ExtensionRootDirectory, new string[] { "*/content/**/*.as" });
 
             project.MergeInteractionFileSet(extInteractionFiles);
             project.MergeTestFileSet(extTestFiles);
@@ -135,7 +137,7 @@ namespace AutoStep.CommandLine
 
         protected void WriteBuildResults(ILoggerFactory logFactory, ProjectCompilerResult result)
         {
-            var logger = logFactory.CreateLogger<Program>();
+            var logger = logFactory.CreateLogger("build");
 
             foreach (var message in result.Messages)
             {
@@ -149,7 +151,7 @@ namespace AutoStep.CommandLine
             }
         }
 
-        protected async Task<ILoadedExtensions<IExtensionEntryPoint>> LoadExtensionsAsync(BaseProjectArgs projectArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
+        protected async Task<ExtensionsContext> LoadExtensionsAsync(BaseProjectArgs projectArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
         {
             var sourceSettings = new SourceSettings(projectArgs.Directory.FullName);
 
@@ -162,11 +164,27 @@ namespace AutoStep.CommandLine
             }
 
             var extensionsDir = Path.Combine(projectArgs.Directory.FullName, ".autostep", "extensions");
-            var setLoader = new ExtensionSetLoader(extensionsDir, logFactory, "autostep");
+            var setLoader = new ExtensionSetLoader(projectArgs.Directory.FullName, extensionsDir, logFactory, "autostep");
 
-            var loaded = await setLoader.LoadExtensionsAsync<IExtensionEntryPoint>(sourceSettings, projectConfig.GetExtensionConfiguration(), false, cancelToken);
+            var resolved = await setLoader.ResolveExtensionsAsync(sourceSettings,
+                                                                  projectConfig.GetPackageExtensionConfiguration(),
+                                                                  projectConfig.GetLocalExtensionConfiguration(),
+                                                                  false,
+                                                                  cancelToken);
 
-            return loaded;
+            if (resolved.IsValid)
+            {
+                var installedPackages = await resolved.InstallAsync(cancelToken);
+
+                return new ExtensionsContext(extensionsDir, installedPackages.LoadExtensionsFromPackages<IExtensionEntryPoint>(logFactory));
+            }
+
+            if (resolved.Exception is object)
+            {
+                throw resolved.Exception;
+            }
+
+            throw new ExtensionLoadException("Extensions could not be loaded.");
         }
 
         protected async ValueTask<ProjectCompilerResult> CompileAsync(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
