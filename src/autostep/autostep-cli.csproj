@@ -20,9 +20,16 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/autostep/AutoStep.Web</RepositoryUrl>
         <PackageTags>testing, gherkin, autostep, tool</PackageTags>
-        <PackageIcon>nuget-icon.png</PackageIcon>
+        <PackageIcon>icon.png</PackageIcon>
     </PropertyGroup>
 
+    <ItemGroup>
+      <None Include="..\..\build\icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+    </ItemGroup>
+  
     <ItemGroup>
         <PackageReference Include="AutoStep" Version="1.0.0-develop.300" />
         <PackageReference Include="AutoStep.Extensions" Version="1.0.0-develop.53" />
