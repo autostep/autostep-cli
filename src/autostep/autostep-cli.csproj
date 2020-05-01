@@ -6,9 +6,21 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>AutoStep.CommandLine</RootNamespace>
         <AssemblyName>autostep-cli</AssemblyName>
-        <ApplicationIcon>autostep.ico</ApplicationIcon>    
+        <ApplicationIcon>autostep.ico</ApplicationIcon>
+
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>autostep</ToolCommandName>
+        <Authors>AutoStep Team</Authors>
+        <Description>Command-line Interface for the AutoStep Test System</Description>
+        <Copyright>Copyright 2020</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageProjectUrl>https://github.com/autostep/autostep-cli</PackageProjectUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/autostep/AutoStep.Web</RepositoryUrl>
+        <PackageTags>testing, gherkin, autostep, tool</PackageTags>
+        <PackageIcon>../../build/icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
