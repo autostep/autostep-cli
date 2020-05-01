@@ -38,7 +38,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <authors>AutoStep Project Team</authors>
     <!-- projectUrl is required for the community feed -->
     <projectUrl>https://github.com/autostep/autostep-cli</projectUrl>
-    <!--<iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/autostep.png</iconUrl>-->
+    <iconUrl>https://rawcdn.githack.com/autostep/autostep-cli/e8a816585b2481f8c5aff84773158396c733a14e/build/icon.png</iconUrl>
     <copyright>2020</copyright>
     <!-- If there is a license Url available, it is required for the community feed -->
     <!-- <licenseUrl>Software License Location __REMOVE_OR_FILL_OUT__</licenseUrl>

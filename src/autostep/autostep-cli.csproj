@@ -9,7 +9,6 @@
         <ApplicationIcon>autostep.ico</ApplicationIcon>    
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>autostep</ToolCommandName>
-        <PackageOutputPath>../../artifacts</PackageOutputPath>
     </PropertyGroup>
 
     <ItemGroup>

@@ -21,7 +21,7 @@ namespace AutoStep.CommandLine
                             .ConfigureConsole(context =>
                             {
                                 var console = context.Console;
- 
+
                                 var terminal = console.GetTerminal(false, OutputMode.Ansi);
 
                                 if(terminal is object)
