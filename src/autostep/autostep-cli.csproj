@@ -20,7 +20,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/autostep/AutoStep.Web</RepositoryUrl>
         <PackageTags>testing, gherkin, autostep, tool</PackageTags>
-        <PackageIcon>../../build/icon.png</PackageIcon>
+        <PackageIcon>nuget-icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
