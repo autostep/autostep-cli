@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29911.84
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4766E245-A166-45FC-B72A-60DD25ED1BDA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autostep-cli", "src\autostep\autostep-cli.csproj", "{44CBC89B-2F54-410C-9940-492A61E593D3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0CD4927F-A894-4E88-BB17-4F955CB27B93}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -32,35 +30,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{249BE857
 		build\choco\autostep.nuspec = build\choco\autostep.nuspec
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autostep-cli", "src\autostep\autostep-cli.csproj", "{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x64.Build.0 = Debug|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Debug|x86.Build.0 = Debug|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x64.ActiveCfg = Release|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x64.Build.0 = Release|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x86.ActiveCfg = Release|Any CPU
-		{44CBC89B-2F54-410C-9940-492A61E593D3}.Release|x86.Build.0 = Release|Any CPU
+		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{44CBC89B-2F54-410C-9940-492A61E593D3} = {4766E245-A166-45FC-B72A-60DD25ED1BDA}
 		{249BE857-460E-445B-A788-205AD714B10A} = {8F45B712-1603-405E-A989-0FDAB71B6B70}
+		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7} = {4766E245-A166-45FC-B72A-60DD25ED1BDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65016CD9-4154-40F4-92D5-CDB5C91A5BBC}
