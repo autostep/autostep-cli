@@ -2,10 +2,14 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <Version>1.0.0</Version>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
         <RootNamespace>AutoStep.CommandLine</RootNamespace>
         <AssemblyName>autostep-cli</AssemblyName>
+        <ApplicationIcon>autostep.ico</ApplicationIcon>    
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>autostep</ToolCommandName>
+        <PackageOutputPath>../../artifacts</PackageOutputPath>
     </PropertyGroup>
 
     <ItemGroup>

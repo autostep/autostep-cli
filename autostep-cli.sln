@@ -12,12 +12,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		Analysis.ruleset = Analysis.ruleset
-		build.ps1 = build.ps1
+		build-win-x64.ps1 = build-win-x64.ps1
 		Directory.Build.props = Directory.Build.props
 		GitVersion.yml = GitVersion.yml
 		LICENSE = LICENSE
 		NuGet.config = NuGet.config
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{8F45B712-1603-405E-A989-0FDAB71B6B70}"
+	ProjectSection(SolutionItems) = preProject
+		build\icon.png = build\icon.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{249BE857-460E-445B-A788-205AD714B10A}"
+	ProjectSection(SolutionItems) = preProject
+		build\choco\autostep.nuspec = build\choco\autostep.nuspec
 	EndProjectSection
 EndProject
 Global
@@ -48,6 +58,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{44CBC89B-2F54-410C-9940-492A61E593D3} = {4766E245-A166-45FC-B72A-60DD25ED1BDA}
+		{249BE857-460E-445B-A788-205AD714B10A} = {8F45B712-1603-405E-A989-0FDAB71B6B70}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65016CD9-4154-40F4-92D5-CDB5C91A5BBC}
