@@ -34,7 +34,9 @@ jobs:
     #  run: dotnet test --configuration Release --no-build
       
     - name: Pack
+      if: github.repository == 'autostep/autostep-cli'
       run:  dotnet pack ./src/autostep/autostep-cli.csproj --no-build -o ./artifacts/dotnettool -c Release --version-suffix  ${{ steps.gitversion.outputs.PreReleaseTag }}
 
     - name: Push
+      if: github.repository == 'autostep/autostep-cli'
       run: dotnet nuget push 'artifacts/dotnettool/*' -n true -s https://f.feedz.io/autostep/ci/nuget/index.json -k ${{ secrets.FEEDZ_IO_KEY }}
