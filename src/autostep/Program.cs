@@ -8,9 +8,17 @@ using System.Threading.Tasks;
 
 namespace AutoStep.CommandLine
 {
-    class Program
+    /// <summary>
+    /// Entry Point.
+    /// </summary>
+    internal class Program
     {
-        static async Task<int> Main(string[] args)
+        /// <summary>
+        /// Main Method.
+        /// </summary>
+        /// <param name="args">CLI args.</param>
+        /// <returns>Async task.</returns>
+        public static async Task<int> Main(string[] args)
         {
             var parser = new CommandLineBuilder()
                             .AddCommand(new RunCommand())
@@ -24,7 +32,7 @@ namespace AutoStep.CommandLine
 
                                 var terminal = console.GetTerminal(false, OutputMode.Ansi);
 
-                                if(terminal is object)
+                                if (terminal is object)
                                 {
                                     return terminal;
                                 }

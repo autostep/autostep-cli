@@ -8,50 +8,56 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AutoStep.CommandLine.Results
 {
-    public class CommandLineResultsCollector : BaseEventHandler
+    /// <summary>
+    /// Results collector for displaying results on the command line.
+    /// </summary>
+    internal class CommandLineResultsCollector : BaseEventHandler
     {
+        /// <inheritdoc/>
         public override async ValueTask OnExecuteAsync(IServiceProvider scope, RunContext ctxt, Func<IServiceProvider, RunContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var writer = GetConsoleWriter(scope);
 
-            writer.WriteInfo("Test Run Starting");
+            writer.WriteInfo(ResultsMessages.TestRunStarting);
 
             await nextHandler(scope, ctxt, cancelToken);
 
             // Finished.
-            writer.WriteInfo("Test Run Complete");
+            writer.WriteInfo(ResultsMessages.TestRunComplete);
         }
 
+        /// <inheritdoc/>
         public override async ValueTask OnFeatureAsync(IServiceProvider scope, FeatureContext ctxt, Func<IServiceProvider, FeatureContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var writer = GetConsoleWriter(scope);
 
-            writer.WriteInfo($"Starting Feature: {ctxt.Feature.Name}");
+            writer.WriteInfo(ResultsMessages.StartingFeature.FormatWith(ctxt.Feature.Name));
 
             await nextHandler(scope, ctxt, cancelToken);
 
-            writer.WriteInfo($"Completed Feature");
+            writer.WriteInfo(ResultsMessages.CompletedFeature);
         }
 
+        /// <inheritdoc/>
         public override async ValueTask OnScenarioAsync(IServiceProvider scope, ScenarioContext ctxt, Func<IServiceProvider, ScenarioContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var writer = GetConsoleWriter(scope);
 
-            writer.WriteInfo($"Starting Scenario: {ctxt.Scenario.Name}");
+            writer.WriteInfo(ResultsMessages.StartingScenario.FormatWith(ctxt.Scenario.Name));
 
             await nextHandler(scope, ctxt, cancelToken);
 
             if (ctxt.FailException is object)
             {
-                writer.WriteFailure("Scenario Failed");
+                writer.WriteFailure(ResultsMessages.ScenarioFailed);
 
                 if (ctxt.FailException is StepFailureException failure)
                 {
-                    writer.WriteFailure($"  Step Failed: {failure.InnerException!.Message}");
+                    writer.WriteFailure(ResultsMessages.StepFailed.FormatWith(failure.InnerException!.Message));
                 }
                 else if (ctxt.FailException is EventHandlingException eventFail)
                 {
-                    writer.WriteFailure($"  Event Handler Failed: {eventFail.InnerException!.Message}");
+                    writer.WriteFailure(ResultsMessages.EventHandlerFailed.FormatWith(eventFail.InnerException!.Message));
                 }
 
                 if (ctxt.FailingStep is object)
@@ -59,12 +65,12 @@ namespace AutoStep.CommandLine.Results
                     // Failure.
                     // Get the text of the step that failed.
                     var stepText = ctxt.FailingStep.Text;
-                    writer.WriteFailure($"  Failing Step: {stepText}, on line {ctxt.FailingStep.SourceLine}");
+                    writer.WriteFailure(ResultsMessages.FailingStep.FormatWith(stepText, ctxt.FailingStep.SourceLine));
                 }
             }
             else
             {
-                writer.WriteInfo("Scenario Passed");
+                writer.WriteInfo(ResultsMessages.ScenarioPassed);
             }
         }
 

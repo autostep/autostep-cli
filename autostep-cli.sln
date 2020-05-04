@@ -32,6 +32,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{249BE857
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autostep-cli", "src\autostep\autostep-cli.csproj", "{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FDE7B327-1E61-434F-9043-4CC421EA3C08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autostep-cli.tests", "tests\autostep-cli.tests\autostep-cli.tests.csproj", "{C0EC7A8C-ED82-434A-AEC6-A987C71CA559}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +46,10 @@ Global
 		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0EC7A8C-ED82-434A-AEC6-A987C71CA559}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0EC7A8C-ED82-434A-AEC6-A987C71CA559}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0EC7A8C-ED82-434A-AEC6-A987C71CA559}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0EC7A8C-ED82-434A-AEC6-A987C71CA559}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -49,6 +57,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{249BE857-460E-445B-A788-205AD714B10A} = {8F45B712-1603-405E-A989-0FDAB71B6B70}
 		{1CD2285A-88C1-4D92-9E2D-058FA0D7F4B7} = {4766E245-A166-45FC-B72A-60DD25ED1BDA}
+		{C0EC7A8C-ED82-434A-AEC6-A987C71CA559} = {FDE7B327-1E61-434F-9043-4CC421EA3C08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65016CD9-4154-40F4-92D5-CDB5C91A5BBC}

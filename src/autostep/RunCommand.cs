@@ -2,19 +2,26 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.CommandLine.Results;
-using AutoStep.Extensions;
 using AutoStep.Extensions.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace AutoStep.CommandLine
 {
-    public class RunCommand : BuildOperationCommand<RunArgs>
+    /// <summary>
+    /// Defines the command for running tests.
+    /// </summary>
+    internal class RunCommand : BuildOperationCommand<RunArgs>
     {
-        public RunCommand() : base("run", "Build and execute tests.")
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RunCommand"/> class.
+        /// </summary>
+        public RunCommand()
+            : base("run", "Build and execute tests.")
         {
         }
 
+        /// <inheritdoc/>
         public override async Task<int> Execute(RunArgs args, ILoggerFactory logFactory, CancellationToken cancelToken)
         {
             var logger = logFactory.CreateLogger<BuildCommand>();
@@ -44,7 +51,7 @@ namespace AutoStep.CommandLine
         {
             var project = CreateProject(args, projectConfig, extensions);
 
-            if (await BuildAndWriteResultsAsync(args, project, logFactory, cancelToken))
+            if (await BuildAndWriteResultsAsync(project, logFactory, cancelToken))
             {
                 // No errors, run.
                 var testRun = project.CreateTestRun(projectConfig);

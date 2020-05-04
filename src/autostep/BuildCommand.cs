@@ -3,19 +3,25 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.Extensions;
-using AutoStep.Extensions.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace AutoStep.CommandLine
 {
-    public class BuildCommand : BuildOperationCommand<BuildOperationArgs>
+    /// <summary>
+    /// Defines the command that builds a project (but does not run it).
+    /// </summary>
+    internal class BuildCommand : BuildOperationCommand<BuildOperationArgs>
     {
-        public BuildCommand() 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BuildCommand"/> class.
+        /// </summary>
+        public BuildCommand()
             : base("build", "Build interactions and tests.")
         {
         }
 
+        /// <inheritdoc/>
         public override async Task<int> Execute(BuildOperationArgs args, ILoggerFactory logFactory, CancellationToken cancelToken)
         {
             var success = false;
@@ -57,7 +63,7 @@ namespace AutoStep.CommandLine
         {
             var project = CreateProject(args, projectConfig, extensions);
 
-            return await BuildAndWriteResultsAsync(args, project, logFactory, cancelToken);
+            return await BuildAndWriteResultsAsync(project, logFactory, cancelToken);
         }
     }
 }

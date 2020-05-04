@@ -7,7 +7,8 @@
         <RootNamespace>AutoStep.CommandLine</RootNamespace>
         <AssemblyName>autostep-cli</AssemblyName>
         <ApplicationIcon>autostep.ico</ApplicationIcon>
-
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>autostep</ToolCommandName>
         <Authors>AutoStep Team</Authors>
@@ -50,6 +51,30 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+    </ItemGroup>
+  
+    <ItemGroup>
+      <Compile Update="Messages.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Messages.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Results\ResultsMessages.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ResultsMessages.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+  
+    <ItemGroup>
+      <EmbeddedResource Update="Messages.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Results\ResultsMessages.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ResultsMessages.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 
 

@@ -16,14 +16,29 @@ using Microsoft.Extensions.Logging;
 
 namespace AutoStep.CommandLine
 {
-    public abstract class BuildOperationCommand<TArgs> : AutoStepCommand<TArgs>
+    /// <summary>
+    /// Base class for commands that will build a project.
+    /// </summary>
+    /// <typeparam name="TArgs">The command-line arguments structure.</typeparam>
+    internal abstract class BuildOperationCommand<TArgs> : AutoStepCommand<TArgs>
         where TArgs : BuildOperationArgs
     {
-        public BuildOperationCommand(string name, string description = null) : base(name, description)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BuildOperationCommand{TArgs}"/> class.
+        /// </summary>
+        /// <param name="name">The name of the command.</param>
+        /// <param name="description">The command description.</param>
+        public BuildOperationCommand(string name, string? description = null)
+            : base(name, description)
         {
             Add(new Option(new[] { "--attach" }, "Prompts for a debugger prior to project build."));
         }
 
+        /// <summary>
+        /// Get the autostep configuration, given the supplied arguments.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <returns>The configuration.</returns>
         protected IConfiguration GetConfiguration(BaseProjectArgs args)
         {
             var configurationBuilder = new ConfigurationBuilder();
@@ -51,15 +66,23 @@ namespace AutoStep.CommandLine
             return configurationBuilder.Build();
         }
 
+        /// <summary>
+        /// Create a new AutoStep project.
+        /// </summary>
+        /// <param name="args">The provided arguments.</param>
+        /// <param name="projectConfig">The project configuration.</param>
+        /// <param name="extensions">The loaded set of extensions.</param>
+        /// <returns>A new project.</returns>
         protected Project CreateProject(BaseProjectArgs args, IConfiguration projectConfig, ExtensionsContext extensions)
         {
             // Create the project.
             Project project;
 
-            // At this point, launch the debugger.
+            // If diagnostic mode is enabled, then create a project with a compiler in diagnostic mode.
             if (args.Diagnostic)
             {
-                project = new Project(p => ProjectCompiler.CreateWithOptions(p, TestCompilerOptions.EnableDiagnostics, InteractionsCompilerOptions.EnableDiagnostics, false));
+                project = new Project(p => ProjectCompiler.CreateWithOptions(
+                    p, TestCompilerOptions.EnableDiagnostics, InteractionsCompilerOptions.EnableDiagnostics, buildExtendedMethodTableReferences: false));
             }
             else
             {
@@ -91,14 +114,21 @@ namespace AutoStep.CommandLine
             return project;
         }
 
-        protected async Task<bool> BuildAndWriteResultsAsync(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
+        /// <summary>
+        /// Build a project and output the results of the build.
+        /// </summary>
+        /// <param name="project">The autostep project.</param>
+        /// <param name="logFactory">The logger factory.</param>
+        /// <param name="cancelToken">The cancellation token to abort the build.</param>
+        /// <returns>Awaitable task with a result indicating whether the build succeeded.</returns>
+        protected async Task<bool> BuildAndWriteResultsAsync(Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
         {
             var logger = logFactory.CreateLogger("build");
 
-            logger.LogInformation("Compiling Project.");
+            logger.LogInformation(Messages.CompilingProject);
 
             // Execution.
-            var compiled = await CompileAsync(args, project, logFactory, cancelToken);
+            var compiled = await project.Compiler.CompileAsync(logFactory, cancelToken);
 
             var success = true;
 
@@ -107,26 +137,26 @@ namespace AutoStep.CommandLine
 
             if (compiled.Messages.Any(m => m.Level == CompilerMessageLevel.Error))
             {
-                logger.LogWarning("Compilation failed with one or more errors.");
+                logger.LogWarning(Messages.CompilationFailed);
                 success = false;
             }
             else
             {
-                logger.LogInformation("Compiled successfully.");
+                logger.LogInformation(Messages.CompiledSuccessfully);
             }
 
-            logger.LogInformation("Binding Steps.");
+            logger.LogInformation(Messages.BindingFailed);
 
-            var linked = Link(args, project, logFactory, cancelToken);
+            var linked = project.Compiler.Link(cancelToken);
 
             if (success && linked.Messages.Any(m => m.Level == CompilerMessageLevel.Error))
             {
-                logger.LogWarning("Step binding failed with one or more errors.");
+                logger.LogWarning(Messages.BindingFailed);
                 success = false;
             }
             else
             {
-                logger.LogInformation("All steps bound successfully.");
+                logger.LogInformation(Messages.BindingStepsSuccess);
             }
 
             // Write link result.
@@ -135,7 +165,12 @@ namespace AutoStep.CommandLine
             return success;
         }
 
-        protected void WriteBuildResults(ILoggerFactory logFactory, ProjectCompilerResult result)
+        /// <summary>
+        /// Write a build result to the log.
+        /// </summary>
+        /// <param name="logFactory">A log factory.</param>
+        /// <param name="result">The results.</param>
+        protected static void WriteBuildResults(ILoggerFactory logFactory, ProjectCompilerResult result)
         {
             var logger = logFactory.CreateLogger("build");
 
@@ -144,6 +179,7 @@ namespace AutoStep.CommandLine
                 var logLevel = message.Level switch
                 {
                     CompilerMessageLevel.Error => LogLevel.Error,
+                    CompilerMessageLevel.Warning => LogLevel.Warning,
                     _ => LogLevel.Information
                 };
 
@@ -151,9 +187,17 @@ namespace AutoStep.CommandLine
             }
         }
 
-        protected async Task<ExtensionsContext> LoadExtensionsAsync(BaseProjectArgs projectArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
+        /// <summary>
+        /// Load a set of extensions.
+        /// </summary>
+        /// <param name="commandArgs">The command arguments.</param>
+        /// <param name="logFactory">A logger factory.</param>
+        /// <param name="projectConfig">The project configuration.</param>
+        /// <param name="cancelToken">A cancellation token for aborting the extension load.</param>
+        /// <returns>An awaitable task, resulting in a set of loaded extensions.</returns>
+        protected async Task<ExtensionsContext> LoadExtensionsAsync(BaseProjectArgs commandArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
         {
-            var sourceSettings = new SourceSettings(projectArgs.Directory.FullName);
+            var sourceSettings = new SourceSettings(commandArgs.Directory.FullName);
 
             var customSources = projectConfig.GetSection("extensionSources").Get<string[]>() ?? Array.Empty<string>();
 
@@ -163,14 +207,15 @@ namespace AutoStep.CommandLine
                 sourceSettings.AppendCustomSources(customSources);
             }
 
-            var extensionsDir = Path.Combine(projectArgs.Directory.FullName, ".autostep", "extensions");
-            var setLoader = new ExtensionSetLoader(projectArgs.Directory.FullName, extensionsDir, logFactory, "autostep");
+            var extensionsDir = Path.Combine(commandArgs.Directory.FullName, ".autostep", "extensions");
+            var setLoader = new ExtensionSetLoader(commandArgs.Directory.FullName, extensionsDir, logFactory, "autostep");
 
-            var resolved = await setLoader.ResolveExtensionsAsync(sourceSettings,
-                                                                  projectConfig.GetPackageExtensionConfiguration(),
-                                                                  projectConfig.GetLocalExtensionConfiguration(),
-                                                                  false,
-                                                                  cancelToken);
+            var resolved = await setLoader.ResolveExtensionsAsync(
+                sourceSettings,
+                projectConfig.GetPackageExtensionConfiguration(),
+                projectConfig.GetLocalExtensionConfiguration(),
+                false,
+                cancelToken);
 
             if (resolved.IsValid)
             {
@@ -184,18 +229,7 @@ namespace AutoStep.CommandLine
                 throw resolved.Exception;
             }
 
-            throw new ExtensionLoadException("Extensions could not be loaded.");
-        }
-
-        protected async ValueTask<ProjectCompilerResult> CompileAsync(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
-        {
-            // Now, compile.
-            return await project.Compiler.CompileAsync(logFactory, cancelToken);
-        }
-
-        protected ProjectCompilerResult Link(BuildOperationArgs args, Project project, ILoggerFactory logFactory, CancellationToken cancelToken)
-        {
-            return project.Compiler.Link(cancelToken);
+            throw new ExtensionLoadException(Messages.ExtensionsCouldNotBeLoaded);
         }
     }
 }
