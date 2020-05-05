@@ -10,6 +10,9 @@ namespace AutoStep.CommandLine
     /// </summary>
     internal static class ConfigurationExtensions
     {
+        private static readonly string[] DefaultTestGlobs = new[] { "**/*.as" };
+        private static readonly string[] DefaultInteractionGlobs = new[] { "**/*.asi" };
+
         /// <summary>
         /// Get the set of globs for test files.
         /// </summary>
@@ -17,7 +20,16 @@ namespace AutoStep.CommandLine
         /// <returns>A glob set.</returns>
         public static string[] GetTestFileGlobs(this IConfiguration config)
         {
-            return config.GetValue("tests", new[] { "**/*.as" });
+            var globSection = config.GetSection("tests");
+
+            if (globSection.Exists())
+            {
+                return globSection.Get<string[]>();
+            }
+            else
+            {
+                return DefaultTestGlobs;
+            }
         }
 
         /// <summary>
@@ -27,7 +39,16 @@ namespace AutoStep.CommandLine
         /// <returns>A glob set.</returns>
         public static string[] GetInteractionFileGlobs(this IConfiguration config)
         {
-            return config.GetValue("interactions", new[] { "**/*.asi" });
+            var globSection = config.GetSection("interactions");
+
+            if (globSection.Exists())
+            {
+                return globSection.Get<string[]>();
+            }
+            else
+            {
+                return DefaultInteractionGlobs;
+            }
         }
 
         /// <summary>
