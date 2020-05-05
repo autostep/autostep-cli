@@ -137,7 +137,7 @@ namespace AutoStep.CommandLine
 
             if (compiled.Messages.Any(m => m.Level == CompilerMessageLevel.Error))
             {
-                logger.LogWarning(Messages.CompilationFailed);
+                logger.LogError(Messages.CompilationFailed);
                 success = false;
             }
             else
@@ -154,7 +154,7 @@ namespace AutoStep.CommandLine
 
             if (success && linked.Messages.Any(m => m.Level == CompilerMessageLevel.Error))
             {
-                logger.LogWarning(Messages.BindingFailed);
+                logger.LogError(Messages.BindingFailed);
                 success = false;
             }
             else
