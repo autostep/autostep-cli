@@ -209,12 +209,14 @@ namespace AutoStep.CommandLine
 
             var extensionsDir = Path.Combine(commandArgs.Directory.FullName, ".autostep", "extensions");
             var setLoader = new ExtensionSetLoader(commandArgs.Directory.FullName, extensionsDir, logFactory, "autostep");
+            var debugExtensionBuilds = projectConfig.GetValue("debugExtensionBuilds", false);
 
             var resolved = await setLoader.ResolveExtensionsAsync(
                 sourceSettings,
                 projectConfig.GetPackageExtensionConfiguration(),
                 projectConfig.GetLocalExtensionConfiguration(),
                 false,
+                debugExtensionBuilds,
                 cancelToken);
 
             if (resolved.IsValid)
