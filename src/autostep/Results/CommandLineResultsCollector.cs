@@ -13,6 +13,10 @@ namespace AutoStep.CommandLine.Results
     /// </summary>
     internal class CommandLineResultsCollector : BaseEventHandler
     {
+        private int failedScenarios;
+
+        public int FailedScenarios => failedScenarios;
+
         /// <inheritdoc/>
         public override async ValueTask OnExecuteAsync(IServiceProvider scope, RunContext ctxt, Func<IServiceProvider, RunContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
@@ -49,6 +53,8 @@ namespace AutoStep.CommandLine.Results
 
             if (ctxt.FailException is object)
             {
+                Interlocked.Increment(ref failedScenarios);
+
                 writer.WriteFailure(ResultsMessages.ScenarioFailed);
 
                 if (ctxt.FailException is StepFailureException failure)

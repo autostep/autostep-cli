@@ -56,7 +56,9 @@ namespace AutoStep.CommandLine
                 // No errors, run.
                 var testRun = project.CreateTestRun(projectConfig);
 
-                testRun.Events.Add(new CommandLineResultsCollector());
+                var resultsCollector = new CommandLineResultsCollector();
+
+                testRun.Events.Add(resultsCollector);
 
                 foreach (var ext in extensions.LoadedExtensions.ExtensionEntryPoints)
                 {
@@ -78,6 +80,12 @@ namespace AutoStep.CommandLine
                         ext.ConfigureExecutionServices(runConfig, builder);
                     }
                 });
+
+                if (resultsCollector.FailedScenarios > 0)
+                {
+                    // Give a non-zero exit code if tests fail.
+                    return 1;
+                }
 
                 return 0;
             }

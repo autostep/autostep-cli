@@ -1,4 +1,5 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.IO;
@@ -44,15 +45,24 @@ namespace AutoStep.CommandLine
 
             var result = parser.Parse(args);
 
+            var console = new SystemConsole();
+
             if (args.Length == 0)
             {
-                var console = new SystemConsole();
                 var helpBuilder = new HelpBuilder(console);
                 helpBuilder.Write(result.CommandResult.Command);
                 return 0;
             }
 
-            return await result.InvokeAsync();
+            try
+            {
+                return await result.InvokeAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                console.Out.WriteLine("Cancelled.");
+                return 1;
+            }
         }
     }
 }
