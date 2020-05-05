@@ -145,9 +145,12 @@ namespace AutoStep.CommandLine
                 logger.LogInformation(Messages.CompiledSuccessfully);
             }
 
-            logger.LogInformation(Messages.BindingFailed);
+            logger.LogInformation(Messages.BindingSteps);
 
             var linked = project.Compiler.Link(cancelToken);
+
+            // Write link result.
+            WriteBuildResults(logFactory, linked);
 
             if (success && linked.Messages.Any(m => m.Level == CompilerMessageLevel.Error))
             {
@@ -158,9 +161,6 @@ namespace AutoStep.CommandLine
             {
                 logger.LogInformation(Messages.BindingStepsSuccess);
             }
-
-            // Write link result.
-            WriteBuildResults(logFactory, linked);
 
             return success;
         }
