@@ -1,7 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.CommandLine.Results;
+using AutoStep.Extensions;
 using AutoStep.Extensions.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -39,9 +41,20 @@ namespace AutoStep.CommandLine
 
                 return await CreateAndExecuteProject(args, logFactory, projectConfig, extensions, cancelToken);
             }
-            catch (ProjectConfigurationException projectConfigEx)
+            catch (ExtensionLoadException ex)
             {
-                LogConfigurationError(logger, projectConfigEx);
+                logger.LogError(ex.Message);
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var nestedEx in ex.InnerExceptions)
+                {
+                    logger.LogError(nestedEx.Message);
+                }
+            }
+            catch (ProjectConfigurationException configEx)
+            {
+                LogConfigurationError(logger, configEx);
             }
 
             return 1;

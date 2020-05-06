@@ -19,6 +19,10 @@ namespace AutoStep.CommandLine
         /// </summary>
         /// <param name="args">CLI args.</param>
         /// <returns>Async task.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Do not want an unexpected error to look like a proper crash, let's handle it more gracefully.")]
         public static async Task<int> Main(string[] args)
         {
             var parser = new CommandLineBuilder()
@@ -61,6 +65,11 @@ namespace AutoStep.CommandLine
             catch (OperationCanceledException)
             {
                 console.Out.WriteLine("Cancelled.");
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                console.Out.WriteLine($"Unexpected Error: {ex.Message}.");
                 return 1;
             }
         }
