@@ -15,6 +15,9 @@ namespace AutoStep.CommandLine.Results
     {
         private int failedScenarios;
 
+        /// <summary>
+        /// Gets the count of failed scenarios.
+        /// </summary>
         public int FailedScenarios => failedScenarios;
 
         /// <inheritdoc/>
