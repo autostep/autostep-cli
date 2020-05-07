@@ -138,6 +138,9 @@
   <data name="EmptyKeyValueForOptionArgument" xml:space="preserve">
     <value>Cannot have an empty key value for an option argument: '{0}'.</value>
   </data>
+  <data name="EventHandlerFailed" xml:space="preserve">
+    <value>Event handler failed.</value>
+  </data>
   <data name="ExtensionConfigPackageRequired" xml:space="preserve">
     <value>Extensions must have a 'package' value containing the package ID.</value>
   </data>

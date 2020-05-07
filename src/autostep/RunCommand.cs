@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.CommandLine.Results;
+using AutoStep.Execution;
 using AutoStep.Extensions;
 using AutoStep.Extensions.Abstractions;
 using Microsoft.Extensions.Configuration;
@@ -61,14 +62,20 @@ namespace AutoStep.CommandLine
             }
             catch (ExtensionLoadException ex)
             {
-                logger.LogError(ex.Message);
+                LogException(logger, ex);
+            }
+            catch (EventHandlingException ex)
+            {
+                logger.LogError(Messages.EventHandlerFailed);
+
+                if (ex.InnerException is object)
+                {
+                    LogException(logger, ex);
+                }
             }
             catch (AggregateException ex)
             {
-                foreach (var nestedEx in ex.InnerExceptions)
-                {
-                    logger.LogError(nestedEx.Message);
-                }
+                LogException(logger, ex);
             }
             catch (ProjectConfigurationException configEx)
             {
@@ -76,6 +83,21 @@ namespace AutoStep.CommandLine
             }
 
             return 1;
+        }
+
+        private void LogException(ILogger logger, Exception ex)
+        {
+            if (ex is AggregateException aggregate)
+            {
+                foreach (var nestedEx in aggregate.InnerExceptions)
+                {
+                    LogException(logger, nestedEx);
+                }
+            }
+            else
+            {
+                logger.LogError(ex.Message);
+            }
         }
 
         private async Task<int> CreateAndExecuteProject(RunArgs args, ILoggerFactory logFactory, IConfiguration projectConfig, ExtensionsContext extensions, CancellationToken cancelToken)

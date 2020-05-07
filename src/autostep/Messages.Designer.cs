@@ -124,6 +124,15 @@ namespace AutoStep.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Event handler failed..
+        /// </summary>
+        internal static string EventHandlerFailed {
+            get {
+                return ResourceManager.GetString("EventHandlerFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Extensions must have a &apos;package&apos; value containing the package ID..
         /// </summary>
         internal static string ExtensionConfigPackageRequired {
