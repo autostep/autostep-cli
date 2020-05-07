@@ -158,5 +158,14 @@ namespace AutoStep.CommandLine {
                 return ResourceManager.GetString("ProjectConfigurationError", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified run configuration ({0}) is not present in the &apos;runConfigs&apos; section of your configuration file..
+        /// </summary>
+        internal static string RunConfigurationNotAvailable {
+            get {
+                return ResourceManager.GetString("RunConfigurationNotAvailable", resourceCulture);
+            }
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.CommandLine;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ namespace AutoStep.CommandLine
         public RunCommand()
             : base("run", "Build and execute tests.")
         {
+            AddArgument(new Argument<string?>("runConfig") { Arity = ArgumentArity.ZeroOrOne });
         }
 
         /// <inheritdoc/>
@@ -30,7 +33,22 @@ namespace AutoStep.CommandLine
 
             try
             {
-                var projectConfig = GetConfiguration(args);
+                IConfiguration projectConfig;
+
+                if (args.RunConfig is object)
+                {
+                    projectConfig = GetConfiguration(args, new[] { new KeyValuePair<string, string>("runConfig", args.RunConfig) });
+
+                    if (!projectConfig.GetSection("runConfigs:" + args.RunConfig).Exists())
+                    {
+                        logger.LogError(Messages.RunConfigurationNotAvailable, args.RunConfig);
+                        return 1;
+                    }
+                }
+                else
+                {
+                    projectConfig = GetConfiguration(args);
+                }
 
                 using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, cancelToken);
 

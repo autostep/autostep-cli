@@ -150,4 +150,7 @@
   <data name="ProjectConfigurationError" xml:space="preserve">
     <value>Project Configuration Error: {0}</value>
   </data>
+  <data name="RunConfigurationNotAvailable" xml:space="preserve">
+    <value>Specified run configuration ({0}) is not present in the 'runConfigs' section of your configuration file.</value>
+  </data>
 </root>

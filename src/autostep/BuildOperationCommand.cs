@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.Diagnostics;
 using System.IO;
@@ -38,8 +40,9 @@ namespace AutoStep.CommandLine
         /// Get the autostep configuration, given the supplied arguments.
         /// </summary>
         /// <param name="args">The arguments.</param>
+        /// <param name="additionalOptions">Additional items to add to the configuration.</param>
         /// <returns>The configuration.</returns>
-        protected IConfiguration GetConfiguration(BaseProjectArgs args)
+        protected IConfiguration GetConfiguration(BaseProjectArgs args, IEnumerable<KeyValuePair<string, string>>? additionalOptions = null)
         {
             var configurationBuilder = new ConfigurationBuilder();
 
@@ -62,6 +65,12 @@ namespace AutoStep.CommandLine
 
             // Add the provided command line options.
             configurationBuilder.AddInMemoryCollection(args.Option);
+
+            // Add any additional options.
+            if (additionalOptions is object)
+            {
+                configurationBuilder.AddInMemoryCollection(additionalOptions);
+            }
 
             return configurationBuilder.Build();
         }
