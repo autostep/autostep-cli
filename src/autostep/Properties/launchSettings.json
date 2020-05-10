@@ -2,7 +2,7 @@
   "profiles": {
     "autostep-cli": {
       "commandName": "Project",
-      "commandLineArgs": "run -d C:\\Work\\GitHub\\AutoStep.Web\\interactions"
+      "commandLineArgs": "run -d C:\\Work\\GitHub\\AutoStep.Web\\interactions ci"
     }
   }
 }

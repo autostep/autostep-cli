@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoStep.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace AutoStep.CommandLine
@@ -60,6 +61,18 @@ namespace AutoStep.CommandLine
                 cfg.AddProvider(new ConsoleLoggerProvider(console, minLevel));
                 cfg.SetMinimumLevel(minLevel);
             });
+        }
+
+        /// <summary>
+        /// Create the environment block for loading extensions and executing tests.
+        /// </summary>
+        /// <param name="args">The command-line args.</param>
+        /// <returns>A new environment block.</returns>
+        protected IAutoStepEnvironment CreateEnvironment(BaseProjectArgs args)
+        {
+            var extensionsDir = Path.Combine(args.Directory.FullName, ".autostep", "extensions");
+
+            return new AutoStepEnvironment(args.Directory.FullName, extensionsDir);
         }
 
         /// <summary>

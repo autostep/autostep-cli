@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.CommandLine;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.Extensions;
+using AutoStep.Extensions.Abstractions;
 using AutoStep.Language;
 using AutoStep.Language.Interaction;
 using AutoStep.Language.Test;
@@ -81,8 +80,13 @@ namespace AutoStep.CommandLine
         /// <param name="args">The provided arguments.</param>
         /// <param name="projectConfig">The project configuration.</param>
         /// <param name="extensions">The loaded set of extensions.</param>
+        /// <param name="environment">The environment block.</param>
         /// <returns>A new project.</returns>
-        protected Project CreateProject(BaseProjectArgs args, IConfiguration projectConfig, ExtensionsContext extensions)
+        protected Project CreateProject(
+            BaseProjectArgs args,
+            IConfiguration projectConfig,
+            ILoadedExtensions<IExtensionEntryPoint> extensions,
+            IAutoStepEnvironment environment)
         {
             // Create the project.
             Project project;
@@ -99,22 +103,22 @@ namespace AutoStep.CommandLine
             }
 
             // Let our extensions extend the project.
-            foreach (var ext in extensions.LoadedExtensions.ExtensionEntryPoints)
+            foreach (var ext in extensions.ExtensionEntryPoints)
             {
                 ext.AttachToProject(projectConfig, project);
             }
 
             // Add any files from extension content.
             // Treat the extension directory as a single file set (one for interactions, one for test).
-            var extInteractionFiles = FileSet.Create(extensions.ExtensionRootDirectory, new string[] { "*/content/**/*.asi" });
-            var extTestFiles = FileSet.Create(extensions.ExtensionRootDirectory, new string[] { "*/content/**/*.as" });
+            var extInteractionFiles = FileSet.Create(environment.ExtensionsDirectory, new string[] { "*/content/**/*.asi" });
+            var extTestFiles = FileSet.Create(environment.ExtensionsDirectory, new string[] { "*/content/**/*.as" });
 
             project.MergeInteractionFileSet(extInteractionFiles);
             project.MergeTestFileSet(extTestFiles);
 
             // Define file sets for interaction and test.
-            var interactionFiles = FileSet.Create(args.Directory.FullName, projectConfig.GetInteractionFileGlobs(), new string[] { ".autostep/**" });
-            var testFiles = FileSet.Create(args.Directory.FullName, projectConfig.GetTestFileGlobs(), new string[] { ".autostep/**" });
+            var interactionFiles = FileSet.Create(environment.RootDirectory, projectConfig.GetInteractionFileGlobs(), new string[] { ".autostep/**" });
+            var testFiles = FileSet.Create(environment.RootDirectory, projectConfig.GetTestFileGlobs(), new string[] { ".autostep/**" });
 
             // Add the two file sets.
             project.MergeInteractionFileSet(interactionFiles);
@@ -202,9 +206,15 @@ namespace AutoStep.CommandLine
         /// <param name="commandArgs">The command arguments.</param>
         /// <param name="logFactory">A logger factory.</param>
         /// <param name="projectConfig">The project configuration.</param>
+        /// <param name="environment">The environment block.</param>
         /// <param name="cancelToken">A cancellation token for aborting the extension load.</param>
         /// <returns>An awaitable task, resulting in a set of loaded extensions.</returns>
-        protected async Task<ExtensionsContext> LoadExtensionsAsync(BaseProjectArgs commandArgs, ILoggerFactory logFactory, IConfiguration projectConfig, CancellationToken cancelToken)
+        protected async Task<ILoadedExtensions<IExtensionEntryPoint>> LoadExtensionsAsync(
+            BaseProjectArgs commandArgs,
+            ILoggerFactory logFactory,
+            IConfiguration projectConfig,
+            IAutoStepEnvironment environment,
+            CancellationToken cancelToken)
         {
             var sourceSettings = new SourceSettings(commandArgs.Directory.FullName);
 
@@ -216,8 +226,7 @@ namespace AutoStep.CommandLine
                 sourceSettings.AppendCustomSources(customSources);
             }
 
-            var extensionsDir = Path.Combine(commandArgs.Directory.FullName, ".autostep", "extensions");
-            var setLoader = new ExtensionSetLoader(commandArgs.Directory.FullName, extensionsDir, logFactory, "autostep");
+            var setLoader = new ExtensionSetLoader(environment, logFactory, "autostep");
             var debugExtensionBuilds = projectConfig.GetValue("debugExtensionBuilds", false);
 
             var resolved = await setLoader.ResolveExtensionsAsync(
@@ -232,7 +241,7 @@ namespace AutoStep.CommandLine
             {
                 var installedPackages = await resolved.InstallAsync(cancelToken);
 
-                return new ExtensionsContext(extensionsDir, installedPackages.LoadExtensionsFromPackages<IExtensionEntryPoint>(logFactory));
+                return installedPackages.LoadExtensionsFromPackages<IExtensionEntryPoint>(logFactory);
             }
 
             if (resolved.Exception is object)

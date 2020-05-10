@@ -51,14 +51,16 @@ namespace AutoStep.CommandLine
                     projectConfig = GetConfiguration(args);
                 }
 
-                using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, cancelToken);
+                var environment = CreateEnvironment(args);
+
+                using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, environment, cancelToken);
 
                 if (args.Attach)
                 {
                     Debugger.Launch();
                 }
 
-                return await CreateAndExecuteProject(args, logFactory, projectConfig, extensions, cancelToken);
+                return await CreateAndExecuteProject(args, logFactory, projectConfig, extensions, environment, cancelToken);
             }
             catch (ExtensionLoadException ex)
             {
@@ -100,9 +102,15 @@ namespace AutoStep.CommandLine
             }
         }
 
-        private async Task<int> CreateAndExecuteProject(RunArgs args, ILoggerFactory logFactory, IConfiguration projectConfig, ExtensionsContext extensions, CancellationToken cancelToken)
+        private async Task<int> CreateAndExecuteProject(
+            RunArgs args,
+            ILoggerFactory logFactory,
+            IConfiguration projectConfig,
+            ILoadedExtensions<IExtensionEntryPoint> extensions,
+            IAutoStepEnvironment environment,
+            CancellationToken cancelToken)
         {
-            var project = CreateProject(args, projectConfig, extensions);
+            var project = CreateProject(args, projectConfig, extensions, environment);
 
             if (await BuildAndWriteResultsAsync(project, logFactory, cancelToken))
             {
@@ -113,7 +121,7 @@ namespace AutoStep.CommandLine
 
                 testRun.Events.Add(resultsCollector);
 
-                foreach (var ext in extensions.LoadedExtensions.ExtensionEntryPoints)
+                foreach (var ext in extensions.ExtensionEntryPoints)
                 {
                     // Allow extensions to extend the execution behaviour.
                     ext.ExtendExecution(projectConfig, testRun);
@@ -126,9 +134,11 @@ namespace AutoStep.CommandLine
                     builder.RegisterInstance<IConsoleResultsWriter>(new ConsoleResultsWriter(logFactory));
 
                     // Register the extension set (might need it later).
-                    builder.RegisterInstance<ILoadedExtensions>(extensions.LoadedExtensions);
+                    builder.RegisterInstance<ILoadedExtensions>(extensions);
 
-                    foreach (var ext in extensions.LoadedExtensions.ExtensionEntryPoints)
+                    builder.RegisterInstance(environment);
+
+                    foreach (var ext in extensions.ExtensionEntryPoints)
                     {
                         ext.ConfigureExecutionServices(runConfig, builder);
                     }

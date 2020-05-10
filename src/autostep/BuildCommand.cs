@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.Extensions;
+using AutoStep.Extensions.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -31,14 +32,16 @@ namespace AutoStep.CommandLine
             {
                 var projectConfig = GetConfiguration(args);
 
-                using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, cancelToken);
+                var environment = CreateEnvironment(args);
+
+                using var extensions = await LoadExtensionsAsync(args, logFactory, projectConfig, environment, cancelToken);
 
                 if (args.Attach)
                 {
                     Debugger.Launch();
                 }
 
-                success = await CreateAndBuildProject(args, projectConfig, logFactory, extensions, cancelToken);
+                success = await CreateAndBuildProject(args, projectConfig, logFactory, extensions, environment, cancelToken);
             }
             catch (ExtensionLoadException ex)
             {
@@ -59,9 +62,15 @@ namespace AutoStep.CommandLine
             return success ? 0 : 1;
         }
 
-        private async Task<bool> CreateAndBuildProject(BuildOperationArgs args, IConfiguration projectConfig, ILoggerFactory logFactory, ExtensionsContext extensions, CancellationToken cancelToken)
+        private async Task<bool> CreateAndBuildProject(
+            BuildOperationArgs args,
+            IConfiguration projectConfig,
+            ILoggerFactory logFactory,
+            ILoadedExtensions<IExtensionEntryPoint> extensions,
+            IAutoStepEnvironment environment,
+            CancellationToken cancelToken)
         {
-            var project = CreateProject(args, projectConfig, extensions);
+            var project = CreateProject(args, projectConfig, extensions, environment);
 
             return await BuildAndWriteResultsAsync(project, logFactory, cancelToken);
         }
