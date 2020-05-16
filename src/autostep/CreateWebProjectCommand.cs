@@ -17,8 +17,9 @@ namespace AutoStep.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateWebProjectCommand"/> class.
         /// </summary>
-        public CreateWebProjectCommand()
-            : base("web", "creates a new web project with an example interactions file(.asi), tests file(.as) file and autostep.config.json with AutoStep.Web extension.", NewProjectFileIO.CreateWebProjectFiles)
+        /// <param name="autoStepFiles">Instance of <see cref="AutoStepFiles"/> that creates the necessary projects files for web project.</param>
+        public CreateWebProjectCommand(AutoStepFiles autoStepFiles)
+            : base("web", "creates a new web project with an example interactions file(.asi), tests file(.as) file and autostep.config.json with AutoStep.Web extension.", autoStepFiles.CreateWebProject)
         {
         }
     }

@@ -14,15 +14,16 @@ namespace AutoStep.CommandLine
     /// </summary>
     internal class CreateProjectCommand : AutoStepCommand<RunArgs>
     {
-        private readonly CreateProject createProj;
+        private readonly CreateProjectDelegate createProj;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateProjectCommand"/> class.
         /// </summary>
-        public CreateProjectCommand()
-            : this("project", "creates a new project with single test file(.as) file and an empty autostep.config.json.", NewProjectFileIO.CreateBlankProjectFiles)
+        /// <param name="autoStepFiles">Instance of <see cref="AutoStepFiles"/> that creates the necessary project files for a blank project.</param>
+        public CreateProjectCommand(AutoStepFiles autoStepFiles)
+            : this("project", "creates a new project with single test file(.as) file and an empty autostep.config.json.", autoStepFiles.CreateBlankProject)
         {
-            AddCommand(new CreateWebProjectCommand());
+            AddCommand(new CreateWebProjectCommand(autoStepFiles));
         }
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace AutoStep.CommandLine
         /// <param name="name">command name.</param>
         /// <param name="description">command description.</param>
         /// <param name="createProj">delegate reference to the method that creates the project.</param>
-        protected CreateProjectCommand(string name, string description, CreateProject createProj)
+        protected CreateProjectCommand(string name, string description, CreateProjectDelegate createProj)
             : base(name, description)
         {
             AddCommonOptions();
@@ -55,9 +56,12 @@ namespace AutoStep.CommandLine
             {
                 return Task.FromResult(createProj(args, logger));
             }
-            catch (ProjectConfigurationException projectConfigEx)
+            catch (AggregateException ex)
             {
-                LogConfigurationError(logger, projectConfigEx);
+                foreach (var nestedEx in ex.InnerExceptions)
+                {
+                    logger.LogError(nestedEx.Message);
+                }
             }
 
             return Task.FromResult(1);
@@ -69,7 +73,7 @@ namespace AutoStep.CommandLine
         /// <param name="args">Run args from the command line.</param>
         /// <param name="logger">logger instance.</param>
         /// <returns>success code - 0 (success) or 1 (fail).</returns>
-        internal delegate int CreateProject(RunArgs args, ILogger logger);
+        internal delegate int CreateProjectDelegate(RunArgs args, ILogger logger);
 
         /// <summary>
         /// Util class to host all the common Options for creating new autostep projects.

@@ -28,7 +28,7 @@ namespace AutoStep.CommandLine
             var parser = new CommandLineBuilder()
                             .AddCommand(new RunCommand())
                             .AddCommand(new BuildCommand())
-                            .AddCommand(new NewProjectCommand())
+                            .AddCommand(new NewProjectCommand(AutoStepFiles.Default))
                             .UseParseErrorReporting()
                             .CancelOnProcessTermination()
                             .UseHelp()

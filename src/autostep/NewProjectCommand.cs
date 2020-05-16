@@ -19,10 +19,11 @@ namespace AutoStep.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="NewProjectCommand"/> class.
         /// </summary>
-        public NewProjectCommand()
+        /// <param name="autoStepFiles">Instance of <see cref="AutoStepFiles"/> that creates the necessary project files.</param>
+        public NewProjectCommand(AutoStepFiles autoStepFiles)
             : base("new", "create a new project.")
         {
-            AddCommand(new CreateProjectCommand());
+            AddCommand(new CreateProjectCommand(autoStepFiles));
         }
 
         /// <summary>
