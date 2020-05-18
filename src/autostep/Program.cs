@@ -28,6 +28,7 @@ namespace AutoStep.CommandLine
             var parser = new CommandLineBuilder()
                             .AddCommand(new RunCommand())
                             .AddCommand(new BuildCommand())
+                            .AddCommand(new NewProjectCommand(AutoStepFiles.Default))
                             .UseParseErrorReporting()
                             .CancelOnProcessTermination()
                             .UseHelp()
@@ -51,7 +52,7 @@ namespace AutoStep.CommandLine
 
             var console = new SystemConsole();
 
-            if (args.Length == 0)
+            if (ShouldDisplayHelp(args, result))
             {
                 var helpBuilder = new HelpBuilder(console);
                 helpBuilder.Write(result.CommandResult.Command);
@@ -73,5 +74,14 @@ namespace AutoStep.CommandLine
                 return 1;
             }
         }
+
+        private static bool ShouldDisplayHelp(string[] args, ParseResult result) =>
+            NoArgsPassed(args) ||
+            !IsValidAutoStepCommand(result);
+
+        private static bool NoArgsPassed(string[] args) => args.Length == 0;
+
+        private static bool IsValidAutoStepCommand(ParseResult result) =>
+            (result.CommandResult.Command is IAutostepCommand cmd) ? cmd.CommandIsValid() : false;
     }
 }

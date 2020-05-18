@@ -88,6 +88,24 @@ namespace AutoStep.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Blank project created..
+        /// </summary>
+        internal static string BlankProjectCreated {
+            get {
+                return ResourceManager.GetString("BlankProjectCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blank web project created..
+        /// </summary>
+        internal static string BlankWebProjectCreated {
+            get {
+                return ResourceManager.GetString("BlankWebProjectCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compilation failed with one or more errors..
         /// </summary>
         internal static string CompilationFailed {

@@ -33,6 +33,10 @@ namespace AutoStep.CommandLine
             : base(name, description)
         {
             Add(new Option(new[] { "--attach" }, "Prompts for a debugger prior to project build."));
+            Add(new Option(new[] { "-d", "--directory" }, "Provide the base directory for the autostep project.")
+            {
+                Argument = new Argument<DirectoryInfo>(() => new DirectoryInfo(Environment.CurrentDirectory)).ExistingOnly(),
+            });
         }
 
         /// <summary>

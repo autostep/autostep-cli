@@ -126,6 +126,12 @@
   <data name="BindingStepsSuccess" xml:space="preserve">
     <value>All steps bound successfully.</value>
   </data>
+  <data name="BlankProjectCreated" xml:space="preserve">
+    <value>Blank project created.</value>
+  </data>
+  <data name="BlankWebProjectCreated" xml:space="preserve">
+    <value>Blank web project created.</value>
+  </data>
   <data name="CompilationFailed" xml:space="preserve">
     <value>Compilation failed with one or more errors.</value>
   </data>
