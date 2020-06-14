@@ -6,10 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoStep.CommandLine.Results;
 using AutoStep.Execution;
+using AutoStep.Execution.Results;
 using AutoStep.Extensions;
 using AutoStep.Extensions.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AutoStep.CommandLine
 {
@@ -30,7 +32,7 @@ namespace AutoStep.CommandLine
         /// <inheritdoc/>
         public override async Task<int> Execute(RunArgs args, ILoggerFactory logFactory, CancellationToken cancelToken)
         {
-            var logger = logFactory.CreateLogger<BuildCommand>();
+            var logger = logFactory.CreateLogger<RunCommand>();
 
             try
             {
@@ -117,9 +119,10 @@ namespace AutoStep.CommandLine
                 // No errors, run.
                 var testRun = project.CreateTestRun(projectConfig);
 
-                var resultsCollector = new CommandLineResultsCollector();
+                // Add our progress reporter.
+                testRun.Events.Add(new CommandLineProgressReporter());
 
-                testRun.Events.Add(resultsCollector);
+                testRun.AddDefaultResultsCollector();
 
                 foreach (var ext in extensions.ExtensionEntryPoints)
                 {
@@ -127,16 +130,21 @@ namespace AutoStep.CommandLine
                     ext.ExtendExecution(projectConfig, testRun);
                 }
 
-                // Execute the test run, allowing extensions to register their own services.
-                await testRun.ExecuteAsync(logFactory, cancelToken, (runConfig, builder) =>
-                {
-                    // Register the console provider.
-                    builder.RegisterInstance<IConsoleResultsWriter>(new ConsoleResultsWriter(logFactory));
+                var consoleResultsExporter = new ConsoleResultsExporter();
 
+                // Do not use the logger factory for console output (we will capture events and use that instead).
+                // TODO: If a 'log file' option is supplied, then we may write to that as well in future.
+
+                // Execute the test run, allowing extensions to register their own services.
+                await testRun.ExecuteAsync(NullLoggerFactory.Instance, cancelToken, (runConfig, builder) =>
+                {
                     // Register the extension set (might need it later).
                     builder.RegisterInstance<ILoadedExtensions>(extensions);
 
                     builder.RegisterInstance(environment);
+
+                    // Register the exporter that writes the summary at the end of the run.
+                    builder.RegisterInstance<IResultsExporter>(consoleResultsExporter);
 
                     foreach (var ext in extensions.ExtensionEntryPoints)
                     {
@@ -144,13 +152,10 @@ namespace AutoStep.CommandLine
                     }
                 });
 
-                if (resultsCollector.FailedScenarios > 0)
+                if (consoleResultsExporter.RunResults!.AllPassed)
                 {
-                    // Give a non-zero exit code if tests fail.
-                    return 1;
+                    return 0;
                 }
-
-                return 0;
             }
 
             return 1;

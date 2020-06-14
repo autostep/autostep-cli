@@ -117,34 +117,103 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllTestsPassed" xml:space="preserve">
+    <value>All tests passed.</value>
+  </data>
+  <data name="AverageScenarioRun" xml:space="preserve">
+    <value>Average scenario took {0} to run.</value>
+  </data>
+  <data name="Bullet" xml:space="preserve">
+    <value>- </value>
+  </data>
   <data name="CompletedFeature" xml:space="preserve">
-    <value>Completed Feature</value>
+    <value>Completed Feature "{0}" at {1:T}.</value>
+  </data>
+  <data name="Environment_Computer" xml:space="preserve">
+    <value>Computer</value>
+  </data>
+  <data name="Environment_Format" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Environment_OS" xml:space="preserve">
+    <value>Operating System</value>
+  </data>
+  <data name="Environment_RunConfig" xml:space="preserve">
+    <value>Run Config</value>
   </data>
   <data name="EventHandlerFailed" xml:space="preserve">
-    <value>Event Handler Failed: {0}</value>
+    <value>Event Handler "{0}" failed.</value>
   </data>
   <data name="FailingStep" xml:space="preserve">
     <value>Failing Step: {0}, on line {1}.</value>
   </data>
+  <data name="Fail_AnonInvokeName" xml:space="preserve">
+    <value>un-named</value>
+  </data>
+  <data name="Fail_Feature" xml:space="preserve">
+    <value>"{0}" in {1}</value>
+  </data>
+  <data name="Fail_FeatureException" xml:space="preserve">
+    <value>Exception occurred while starting or ending the feature.</value>
+  </data>
+  <data name="Fail_InvokeBullet" xml:space="preserve">
+    <value>&gt; </value>
+  </data>
+  <data name="Fail_StepFailureOnLine" xml:space="preserve">
+    <value>Step failure on line {0}.</value>
+  </data>
+  <data name="Fail_StepRef" xml:space="preserve">
+    <value>{0} {1}</value>
+  </data>
+  <data name="Fail_VariableDisplay" xml:space="preserve">
+    <value>{0} -&gt; {1}</value>
+  </data>
+  <data name="Heading_Environment" xml:space="preserve">
+    <value>Environment</value>
+  </data>
+  <data name="Heading_Failures" xml:space="preserve">
+    <value>Failures</value>
+  </data>
+  <data name="Heading_Summary" xml:space="preserve">
+    <value>Summary</value>
+  </data>
+  <data name="Heading_TestResults" xml:space="preserve">
+    <value>Test Results</value>
+  </data>
+  <data name="NumberOfFeaturesPassed" xml:space="preserve">
+    <value>/{0} features passed.</value>
+  </data>
+  <data name="OutOfScenarios" xml:space="preserve">
+    <value>/{0} scenarios and outline examples passed.</value>
+  </data>
   <data name="ScenarioFailed" xml:space="preserve">
-    <value>Scenario Failed</value>
+    <value>Scenario "{0}" failed after {1}.</value>
   </data>
   <data name="ScenarioPassed" xml:space="preserve">
-    <value>Scenario Passed.</value>
+    <value>Scenario "{0}" passed after {1}.</value>
   </data>
   <data name="StartingFeature" xml:space="preserve">
-    <value>Starting Feature: {0}</value>
+    <value>Starting Feature "{0}" at {1:T}.</value>
+  </data>
+  <data name="StartingFeatureWithFile" xml:space="preserve">
+    <value>Starting Feature "{0}" from {1} at {2:T}.</value>
   </data>
   <data name="StartingScenario" xml:space="preserve">
-    <value>Starting Scenario: {0}</value>
+    <value>Starting Scenario "{0}" in the "{1}" feature.</value>
+  </data>
+  <data name="StartingScenarioInvocation" xml:space="preserve">
+    <value>Starting Scenario "{0}" [{1}] in the "{2}" feature.</value>
   </data>
   <data name="StepFailed" xml:space="preserve">
     <value>Step Failed: {0}</value>
   </data>
   <data name="TestRunComplete" xml:space="preserve">
-    <value>Test Run Complete</value>
+    <value>Test Run Completed in {0}.</value>
   </data>
   <data name="TestRunStarting" xml:space="preserve">
-    <value>Test Run Starting</value>
+    <value>Test Run Starting.</value>
+  </data>
+  <data name="TestsFailed" xml:space="preserve">
+    <value>One or more tests FAILED.</value>
   </data>
 </root>

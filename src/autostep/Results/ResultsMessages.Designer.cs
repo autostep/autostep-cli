@@ -61,7 +61,34 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Completed Feature.
+        ///   Looks up a localized string similar to All tests passed..
+        /// </summary>
+        internal static string AllTestsPassed {
+            get {
+                return ResourceManager.GetString("AllTestsPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Average scenario took {0} to run..
+        /// </summary>
+        internal static string AverageScenarioRun {
+            get {
+                return ResourceManager.GetString("AverageScenarioRun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to - .
+        /// </summary>
+        internal static string Bullet {
+            get {
+                return ResourceManager.GetString("Bullet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed Feature &quot;{0}&quot; at {1:T}..
         /// </summary>
         internal static string CompletedFeature {
             get {
@@ -70,11 +97,110 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Event Handler Failed: {0}.
+        ///   Looks up a localized string similar to Computer.
+        /// </summary>
+        internal static string Environment_Computer {
+            get {
+                return ResourceManager.GetString("Environment_Computer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1}.
+        /// </summary>
+        internal static string Environment_Format {
+            get {
+                return ResourceManager.GetString("Environment_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operating System.
+        /// </summary>
+        internal static string Environment_OS {
+            get {
+                return ResourceManager.GetString("Environment_OS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run Config.
+        /// </summary>
+        internal static string Environment_RunConfig {
+            get {
+                return ResourceManager.GetString("Environment_RunConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event Handler &quot;{0}&quot; failed..
         /// </summary>
         internal static string EventHandlerFailed {
             get {
                 return ResourceManager.GetString("EventHandlerFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to un-named.
+        /// </summary>
+        internal static string Fail_AnonInvokeName {
+            get {
+                return ResourceManager.GetString("Fail_AnonInvokeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; in {1}.
+        /// </summary>
+        internal static string Fail_Feature {
+            get {
+                return ResourceManager.GetString("Fail_Feature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception occurred while starting or ending the feature..
+        /// </summary>
+        internal static string Fail_FeatureException {
+            get {
+                return ResourceManager.GetString("Fail_FeatureException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &gt; .
+        /// </summary>
+        internal static string Fail_InvokeBullet {
+            get {
+                return ResourceManager.GetString("Fail_InvokeBullet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Step failure on line {0}..
+        /// </summary>
+        internal static string Fail_StepFailureOnLine {
+            get {
+                return ResourceManager.GetString("Fail_StepFailureOnLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1}.
+        /// </summary>
+        internal static string Fail_StepRef {
+            get {
+                return ResourceManager.GetString("Fail_StepRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} -&gt; {1}.
+        /// </summary>
+        internal static string Fail_VariableDisplay {
+            get {
+                return ResourceManager.GetString("Fail_VariableDisplay", resourceCulture);
             }
         }
         
@@ -88,7 +214,61 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Scenario Failed.
+        ///   Looks up a localized string similar to Environment.
+        /// </summary>
+        internal static string Heading_Environment {
+            get {
+                return ResourceManager.GetString("Heading_Environment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failures.
+        /// </summary>
+        internal static string Heading_Failures {
+            get {
+                return ResourceManager.GetString("Heading_Failures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Summary.
+        /// </summary>
+        internal static string Heading_Summary {
+            get {
+                return ResourceManager.GetString("Heading_Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test Results.
+        /// </summary>
+        internal static string Heading_TestResults {
+            get {
+                return ResourceManager.GetString("Heading_TestResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /{0} features passed..
+        /// </summary>
+        internal static string NumberOfFeaturesPassed {
+            get {
+                return ResourceManager.GetString("NumberOfFeaturesPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /{0} scenarios and outline examples passed..
+        /// </summary>
+        internal static string OutOfScenarios {
+            get {
+                return ResourceManager.GetString("OutOfScenarios", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scenario &quot;{0}&quot; failed after {1}..
         /// </summary>
         internal static string ScenarioFailed {
             get {
@@ -97,7 +277,7 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Scenario Passed..
+        ///   Looks up a localized string similar to Scenario &quot;{0}&quot; passed after {1}..
         /// </summary>
         internal static string ScenarioPassed {
             get {
@@ -106,7 +286,7 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Starting Feature: {0}.
+        ///   Looks up a localized string similar to Starting Feature &quot;{0}&quot; at {1:T}..
         /// </summary>
         internal static string StartingFeature {
             get {
@@ -115,11 +295,29 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Starting Scenario: {0}.
+        ///   Looks up a localized string similar to Starting Feature &quot;{0}&quot; from {1} at {2:T}..
+        /// </summary>
+        internal static string StartingFeatureWithFile {
+            get {
+                return ResourceManager.GetString("StartingFeatureWithFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting Scenario &quot;{0}&quot; in the &quot;{1}&quot; feature..
         /// </summary>
         internal static string StartingScenario {
             get {
                 return ResourceManager.GetString("StartingScenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting Scenario &quot;{0}&quot; [{1}] in the &quot;{2}&quot; feature..
+        /// </summary>
+        internal static string StartingScenarioInvocation {
+            get {
+                return ResourceManager.GetString("StartingScenarioInvocation", resourceCulture);
             }
         }
         
@@ -133,7 +331,7 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test Run Complete.
+        ///   Looks up a localized string similar to Test Run Completed in {0}..
         /// </summary>
         internal static string TestRunComplete {
             get {
@@ -142,11 +340,20 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test Run Starting.
+        ///   Looks up a localized string similar to Test Run Starting..
         /// </summary>
         internal static string TestRunStarting {
             get {
                 return ResourceManager.GetString("TestRunStarting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One or more tests FAILED..
+        /// </summary>
+        internal static string TestsFailed {
+            get {
+                return ResourceManager.GetString("TestsFailed", resourceCulture);
             }
         }
     }
