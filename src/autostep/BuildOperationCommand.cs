@@ -98,7 +98,7 @@ namespace AutoStep.CommandLine
             // If diagnostic mode is enabled, then create a project with a compiler in diagnostic mode.
             if (args.Diagnostic)
             {
-                project = new Project(p => ProjectCompiler.CreateWithOptions(
+                project = new Project(p => ProjectBuilder.CreateWithOptions(
                     p, TestCompilerOptions.EnableDiagnostics, InteractionsCompilerOptions.EnableDiagnostics, buildExtendedMethodTableReferences: false));
             }
             else
@@ -144,8 +144,8 @@ namespace AutoStep.CommandLine
 
             logger.LogInformation(Messages.CompilingProject);
 
-            // Execution.
-            var compiled = await project.Compiler.CompileAsync(logFactory, cancelToken);
+            // Compile.
+            var compiled = await project.Builder.CompileAsync(logFactory, cancelToken);
 
             var success = true;
 
@@ -164,7 +164,7 @@ namespace AutoStep.CommandLine
 
             logger.LogInformation(Messages.BindingSteps);
 
-            var linked = project.Compiler.Link(cancelToken);
+            var linked = project.Builder.Link(cancelToken);
 
             // Write link result.
             WriteBuildResults(logFactory, linked);
@@ -187,7 +187,7 @@ namespace AutoStep.CommandLine
         /// </summary>
         /// <param name="logFactory">A log factory.</param>
         /// <param name="result">The results.</param>
-        protected static void WriteBuildResults(ILoggerFactory logFactory, ProjectCompilerResult result)
+        protected static void WriteBuildResults(ILoggerFactory logFactory, ProjectBuilderResult result)
         {
             var logger = logFactory.CreateLogger("build");
 
