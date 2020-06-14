@@ -45,14 +45,19 @@ namespace AutoStep.CommandLine.Results
 
             RenderLogs(logConsumer, 0);
 
-            await nextHandler(scope, ctxt, cancelToken);
+            try
+            {
+                await nextHandler(scope, ctxt, cancelToken);
+            }
+            finally
+            {
+                RenderLogs(logConsumer, 0);
 
-            RenderLogs(logConsumer, 0);
+                var totalElapsed = DateTime.UtcNow - startTime;
 
-            var totalElapsed = DateTime.UtcNow - startTime;
-
-            // Finished.
-            terminal.WriteLine(ResultsMessages.TestRunComplete.FormatWith(totalElapsed.Humanize()));
+                // Finished.
+                terminal.WriteLine(ResultsMessages.TestRunComplete.FormatWith(totalElapsed.Humanize()));
+            }
         }
 
         /// <inheritdoc/>

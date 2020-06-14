@@ -74,7 +74,7 @@ namespace AutoStep.CommandLine
 
                 if (ex.InnerException is object)
                 {
-                    LogException(logger, ex);
+                    LogException(logger, ex.InnerException);
                 }
             }
             catch (AggregateException ex)
