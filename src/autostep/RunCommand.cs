@@ -120,7 +120,7 @@ namespace AutoStep.CommandLine
                 var testRun = project.CreateTestRun(projectConfig);
 
                 // Add our progress reporter.
-                testRun.Events.Add(new CommandLineProgressReporter());
+                testRun.Events.Add(new CommandLineProgressReporter(Console));
 
                 testRun.AddDefaultResultsCollector();
 
@@ -130,7 +130,7 @@ namespace AutoStep.CommandLine
                     ext.ExtendExecution(projectConfig, testRun);
                 }
 
-                var consoleResultsExporter = new ConsoleResultsExporter();
+                var consoleResultsExporter = new ConsoleResultsExporter(Console);
 
                 // Do not use the logger factory for console output (we will capture events and use that instead).
                 // TODO: If a 'log file' option is supplied, then we may write to that as well in future.

@@ -32,19 +32,6 @@ namespace AutoStep.CommandLine
                             .UseParseErrorReporting()
                             .CancelOnProcessTermination()
                             .UseHelp()
-                            .ConfigureConsole(context =>
-                            {
-                                var console = context.Console;
-
-                                var terminal = console.GetTerminal(false, OutputMode.Ansi);
-
-                                if (terminal is object)
-                                {
-                                    return terminal;
-                                }
-
-                                return console;
-                            })
                             .UseVersionOption()
                             .Build();
 

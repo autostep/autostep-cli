@@ -1,9 +1,11 @@
 ﻿using System;
+using System.CommandLine;
 using System.CommandLine.IO;
 using System.CommandLine.Rendering;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoStep.CommandLine.Output;
 using AutoStep.Elements.Metadata;
 using AutoStep.Execution;
 using AutoStep.Execution.Contexts;
@@ -20,17 +22,16 @@ namespace AutoStep.CommandLine.Results
     /// </summary>
     internal class CommandLineProgressReporter : BaseEventHandler
     {
-        private readonly ITerminal terminal;
+        private readonly IConsoleWriter console;
         private readonly object consoleSync = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineProgressReporter"/> class.
         /// </summary>
-        public CommandLineProgressReporter()
+        /// <param name="console">Console writer.</param>
+        public CommandLineProgressReporter(IConsoleWriter console)
         {
-            var console = new SystemConsole();
-
-            terminal = console.GetTerminal(false, OutputMode.Ansi);
+            this.console = console;
         }
 
         /// <inheritdoc/>
@@ -38,8 +39,8 @@ namespace AutoStep.CommandLine.Results
         {
             var startTime = DateTime.UtcNow;
 
-            terminal.WriteLine();
-            terminal.WriteLine(ResultsMessages.TestRunStarting);
+            console.WriteLine();
+            console.WriteLine(ResultsMessages.TestRunStarting);
 
             var logConsumer = ctxt.GetLogConsumer();
 
@@ -56,7 +57,7 @@ namespace AutoStep.CommandLine.Results
                 var totalElapsed = DateTime.UtcNow - startTime;
 
                 // Finished.
-                terminal.WriteLine(ResultsMessages.TestRunComplete.FormatWith(totalElapsed.Humanize()));
+                console.WriteLine(ResultsMessages.TestRunComplete.FormatWith(totalElapsed.Humanize()));
             }
         }
 
@@ -69,11 +70,11 @@ namespace AutoStep.CommandLine.Results
             {
                 if (ctxt.Feature.SourceName is null)
                 {
-                    terminal.WriteLine(ResultsMessages.StartingFeature.FormatWith(ctxt.Feature.Name, DateTime.Now));
+                    console.WriteLine(ResultsMessages.StartingFeature.FormatWith(ctxt.Feature.Name, DateTime.Now));
                 }
                 else
                 {
-                    terminal.WriteLine(ResultsMessages.StartingFeatureWithFile.FormatWith(ctxt.Feature.Name, ctxt.Feature.SourceName, DateTime.Now));
+                    console.WriteLine(ResultsMessages.StartingFeatureWithFile.FormatWith(ctxt.Feature.Name, ctxt.Feature.SourceName, DateTime.Now));
                 }
 
                 RenderLogs(logConsumer, 2);
@@ -88,7 +89,7 @@ namespace AutoStep.CommandLine.Results
                 lock (consoleSync)
                 {
                     RenderLogs(logConsumer, 2);
-                    terminal.WriteLine(ResultsMessages.CompletedFeature.FormatWith(ctxt.Feature.Name, DateTime.Now));
+                    console.WriteLine(ResultsMessages.CompletedFeature.FormatWith(ctxt.Feature.Name, DateTime.Now));
                 }
             }
         }
@@ -117,11 +118,11 @@ namespace AutoStep.CommandLine.Results
                         invokeName = invokeName.Substring(0, 30) + "...";
                     }
 
-                    terminal.WriteLine(ResultsMessages.StartingScenarioInvocation.FormatWith(ctxt.Scenario.Name, invokeName, featureContext.Feature.Name), 2);
+                    console.WriteLine(ResultsMessages.StartingScenarioInvocation.FormatWith(ctxt.Scenario.Name, invokeName, featureContext.Feature.Name), 2);
                 }
                 else
                 {
-                    terminal.WriteLine(ResultsMessages.StartingScenario.FormatWith(ctxt.Scenario.Name, featureContext.Feature.Name), 2);
+                    console.WriteLine(ResultsMessages.StartingScenario.FormatWith(ctxt.Scenario.Name, featureContext.Feature.Name), 2);
                 }
 
                 RenderLogs(logConsumer, 4);
@@ -139,15 +140,15 @@ namespace AutoStep.CommandLine.Results
 
                     if (ctxt.FailException is object)
                     {
-                        terminal.WriteErrorLine(ResultsMessages.ScenarioFailed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
+                        console.WriteErrorLine(ResultsMessages.ScenarioFailed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
 
                         if (ctxt.FailException is StepFailureException failure)
                         {
-                            terminal.WriteErrorLine(ResultsMessages.StepFailed.FormatWith(failure.InnerException!.Message), 4);
+                            console.WriteErrorLine(ResultsMessages.StepFailed.FormatWith(failure.InnerException!.Message), 4);
                         }
                         else if (ctxt.FailException is EventHandlingException eventFail)
                         {
-                            terminal.WriteErrorLine(ResultsMessages.EventHandlerFailed.FormatWith(eventFail.InnerException!.Message), 4);
+                            console.WriteErrorLine(ResultsMessages.EventHandlerFailed.FormatWith(eventFail.InnerException!.Message), 4);
                         }
 
                         if (ctxt.FailingStep is object)
@@ -155,12 +156,12 @@ namespace AutoStep.CommandLine.Results
                             // Failure.
                             // Get the text of the step that failed.
                             var stepText = ctxt.FailingStep.Text;
-                            terminal.WriteErrorLine(ResultsMessages.FailingStep.FormatWith(stepText, ctxt.FailingStep.SourceLine), 4);
+                            console.WriteErrorLine(ResultsMessages.FailingStep.FormatWith(stepText, ctxt.FailingStep.SourceLine), 4);
                         }
                     }
                     else
                     {
-                        terminal.WriteSuccessLine(ResultsMessages.ScenarioPassed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
+                        console.WriteSuccessLine(ResultsMessages.ScenarioPassed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
                     }
                 }
             }
@@ -184,20 +185,23 @@ namespace AutoStep.CommandLine.Results
         {
             while (logConsumer.TryGetNextEntry(out var logEntry))
             {
+                IDisposable? colorBlock = null;
+
                 if (logEntry.LogLevel == LogLevel.Warning)
                 {
-                    terminal.ForegroundColor = ConsoleColor.DarkYellow;
+                    colorBlock = console.EnterWarnBlock();
                 }
                 else if (logEntry.LogLevel > LogLevel.Warning)
                 {
-                    terminal.ForegroundColor = ConsoleColor.Red;
+                    colorBlock = console.EnterErrorBlock();
                 }
 
-                var entryText = logEntry.Text;
+                using (colorBlock)
+                {
+                    var entryText = logEntry.Text;
 
-                terminal.WriteIndentedBlock(entryText, indent);
-
-                terminal.ResetColor();
+                    console.WriteIndentedBlock(entryText, indent);
+                }
             }
         }
 

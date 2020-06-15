@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoStep.CommandLine.Output;
 using AutoStep.Execution.Contexts;
 using AutoStep.Execution.Results;
 using Humanizer;
@@ -18,18 +19,17 @@ namespace AutoStep.CommandLine.Results
     /// </summary>
     public class ConsoleResultsExporter : IResultsExporter
     {
-        private readonly ITerminal terminal;
         private readonly FailWriter failWriter;
+        private readonly IConsoleWriter console;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleResultsExporter"/> class.
         /// </summary>
-        public ConsoleResultsExporter()
+        /// <param name="console">The console writer.</param>
+        public ConsoleResultsExporter(IConsoleWriter console)
         {
-            var console = new SystemConsole();
-
-            terminal = console.GetTerminal(false, OutputMode.Ansi);
-            failWriter = new FailWriter(terminal);
+            this.console = console;
+            failWriter = new FailWriter(console);
         }
 
         /// <summary>
@@ -48,33 +48,33 @@ namespace AutoStep.CommandLine.Results
             RunResults = results ?? throw new ArgumentNullException(nameof(results));
 
             // Write gap, then write table, then write plain-text summary.
-            terminal.WriteLine();
-            terminal.WriteLine();
+            console.WriteLine();
+            console.WriteLine();
 
-            terminal.WriteHeading(ResultsMessages.Heading_TestResults, '=');
+            console.WriteHeading(ResultsMessages.Heading_TestResults, '=');
 
-            terminal.WriteHeading(ResultsMessages.Heading_Environment, '-');
+            console.WriteHeading(ResultsMessages.Heading_Environment, '-');
 
             // Environment info.
             PrintEnvironment(runContext.Configuration);
 
-            terminal.WriteLine();
+            console.WriteLine();
 
-            terminal.WriteHeading(ResultsMessages.Heading_Summary, '-');
+            console.WriteHeading(ResultsMessages.Heading_Summary, '-');
 
             var stats = GetStats(results);
 
             PrintStats(stats);
 
-            terminal.WriteLine();
+            console.WriteLine();
 
             if (!RunResults.AllPassed)
             {
-                terminal.WriteHeading(ResultsMessages.Heading_Failures, '-');
+                console.WriteHeading(ResultsMessages.Heading_Failures, '-');
 
                 failWriter.RenderFailures(results);
 
-                terminal.WriteLine();
+                console.WriteLine();
             }
 
             return default;
@@ -88,12 +88,12 @@ namespace AutoStep.CommandLine.Results
                 //   300/300 features passed.
                 //   1200/1200 scenarios and outline examples passed.
                 //   Average scenario took 12ms to run.
-                terminal.WriteSuccess(ResultsMessages.AllTestsPassed);
-                terminal.WriteLine();
-                terminal.WriteIndent(2);
-                terminal.Write(ResultsMessages.Bullet);
-                terminal.WriteSuccess(stats.FeaturesPassed.ToString(CultureInfo.CurrentCulture));
-                terminal.WriteFormatLine(ResultsMessages.NumberOfFeaturesPassed, stats.FeaturesTotal);
+                console.WriteSuccess(ResultsMessages.AllTestsPassed);
+                console.WriteLine();
+                console.WriteIndent(2);
+                console.Write(ResultsMessages.Bullet);
+                console.WriteSuccess(stats.FeaturesPassed.ToString(CultureInfo.CurrentCulture));
+                console.WriteFormatLine(ResultsMessages.NumberOfFeaturesPassed, stats.FeaturesTotal);
             }
             else
             {
@@ -101,31 +101,31 @@ namespace AutoStep.CommandLine.Results
                 //   300/400 features passed.
                 //   1200/2440 scenario invocations passed.
                 //   Average scenario took 20ms.
-                terminal.WriteError(ResultsMessages.TestsFailed);
-                terminal.WriteLine();
-                terminal.WriteIndent(2);
-                terminal.Write(ResultsMessages.Bullet);
-                terminal.WriteError(stats.FeaturesPassed.ToString(CultureInfo.CurrentCulture));
-                terminal.WriteFormatLine(ResultsMessages.NumberOfFeaturesPassed, stats.FeaturesTotal);
+                console.WriteError(ResultsMessages.TestsFailed);
+                console.WriteLine();
+                console.WriteIndent(2);
+                console.Write(ResultsMessages.Bullet);
+                console.WriteError(stats.FeaturesPassed.ToString(CultureInfo.CurrentCulture));
+                console.WriteFormatLine(ResultsMessages.NumberOfFeaturesPassed, stats.FeaturesTotal);
             }
 
-            terminal.WriteIndent(2);
-            terminal.Write(ResultsMessages.Bullet);
+            console.WriteIndent(2);
+            console.Write(ResultsMessages.Bullet);
 
             if (stats.ScenarioInvocationsPassed == stats.TotalScenarioInvocations)
             {
-                terminal.WriteSuccess(stats.ScenarioInvocationsPassed.ToString(CultureInfo.CurrentCulture));
+                console.WriteSuccess(stats.ScenarioInvocationsPassed.ToString(CultureInfo.CurrentCulture));
             }
             else
             {
-                terminal.WriteError(stats.ScenarioInvocationsPassed.ToString(CultureInfo.CurrentCulture));
+                console.WriteError(stats.ScenarioInvocationsPassed.ToString(CultureInfo.CurrentCulture));
             }
 
-            terminal.WriteFormatLine(ResultsMessages.OutOfScenarios, stats.TotalScenarioInvocations);
+            console.WriteFormatLine(ResultsMessages.OutOfScenarios, stats.TotalScenarioInvocations);
 
-            terminal.WriteIndent(2);
-            terminal.Write(ResultsMessages.Bullet);
-            terminal.WriteFormatLine(ResultsMessages.AverageScenarioRun, stats.AverageElapsed.Humanize());
+            console.WriteIndent(2);
+            console.Write(ResultsMessages.Bullet);
+            console.WriteFormatLine(ResultsMessages.AverageScenarioRun, stats.AverageElapsed.Humanize());
         }
 
         private class ResultStats
@@ -204,9 +204,9 @@ namespace AutoStep.CommandLine.Results
 
         private void PrintEnvironmentLine(string name, string value)
         {
-            terminal.WriteIndent(2);
-            terminal.Write(ResultsMessages.Bullet);
-            terminal.WriteFormatLine(ResultsMessages.Environment_Format, name, value);
+            console.WriteIndent(2);
+            console.Write(ResultsMessages.Bullet);
+            console.WriteFormatLine(ResultsMessages.Environment_Format, name, value);
         }
     }
 }

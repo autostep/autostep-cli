@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.CommandLine;
 using System.CommandLine.IO;
 using System.CommandLine.Rendering;
+using AutoStep.CommandLine.Output;
 using Microsoft.Extensions.Logging;
 
 namespace AutoStep.CommandLine
@@ -12,8 +13,7 @@ namespace AutoStep.CommandLine
     /// </summary>
     internal class ConsoleLoggerProvider : ILoggerProvider
     {
-        private readonly IConsole console;
-        private readonly ITerminal? terminal;
+        private readonly IConsoleWriter console;
         private readonly ConcurrentDictionary<string, ILogger> loggers = new ConcurrentDictionary<string, ILogger>();
 
         /// <summary>
@@ -21,11 +21,10 @@ namespace AutoStep.CommandLine
         /// </summary>
         /// <param name="console">The console.</param>
         /// <param name="minimumLevel">The minimum log level.</param>
-        public ConsoleLoggerProvider(IConsole console, LogLevel minimumLevel)
+        public ConsoleLoggerProvider(IConsoleWriter console, LogLevel minimumLevel)
         {
             this.console = console;
             MinimumLevel = minimumLevel;
-            this.terminal = console as ITerminal;
         }
 
         /// <summary>
@@ -49,21 +48,23 @@ namespace AutoStep.CommandLine
         /// <param name="formatter">The formatter.</param>
         public void Log<TState>(LogLevel logLevel, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if (logLevel >= LogLevel.Error && terminal is object)
+            if (logLevel >= LogLevel.Error)
             {
-                terminal.ForegroundColor = ConsoleColor.Red;
-                terminal.Out.WriteLine(formatter(state, exception));
-                terminal.ResetColor();
+                using (console.EnterErrorBlock())
+                {
+                    console.WriteLine(formatter(state, exception));
+                }
             }
-            else if (logLevel >= LogLevel.Warning && terminal is object)
+            else if (logLevel >= LogLevel.Warning)
             {
-                terminal.ForegroundColor = ConsoleColor.DarkYellow;
-                terminal.Out.WriteLine(formatter(state, exception));
-                terminal.ResetColor();
+                using (console.EnterWarnBlock())
+                {
+                    console.WriteLine(formatter(state, exception));
+                }
             }
             else
             {
-                console.Out.WriteLine(formatter(state, exception));
+                console.WriteLine(formatter(state, exception));
             }
         }
 

@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoStep.CommandLine.Output;
 using AutoStep.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -28,13 +29,19 @@ namespace AutoStep.CommandLine
             : base(name, description)
         {
             AddCommonOptions();
+            Console = ConsoleDetector.GetConsoleWriter();
 
             Handler = CommandHandler.Create(async (TArgs args, IConsole con, CancellationToken token) =>
             {
-                using var logFactory = GetLoggerFactory(args, con);
+                using var logFactory = GetLoggerFactory(args, Console);
                 return await Execute(args, logFactory, token);
             });
         }
+
+        /// <summary>
+        /// Gets the active console writer.
+        /// </summary>
+        protected IConsoleWriter Console { get; }
 
         /// <summary>
         /// Method to check if the command invoked is valid.
@@ -51,7 +58,7 @@ namespace AutoStep.CommandLine
         /// <param name="args">The provided arguments.</param>
         /// <param name="console">The console instance.</param>
         /// <returns>A logger factory.</returns>
-        protected ILoggerFactory GetLoggerFactory(BaseGlobalArgs args, IConsole console)
+        protected ILoggerFactory GetLoggerFactory(BaseGlobalArgs args, IConsoleWriter console)
         {
             return LoggerFactory.Create(cfg =>
             {

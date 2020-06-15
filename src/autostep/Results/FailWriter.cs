@@ -1,5 +1,5 @@
 ﻿using System;
-using System.CommandLine.Rendering;
+using AutoStep.CommandLine.Output;
 using AutoStep.Elements.Metadata;
 using AutoStep.Execution.Results;
 
@@ -10,15 +10,15 @@ namespace AutoStep.CommandLine.Results
     /// </summary>
     internal class FailWriter
     {
-        private readonly ITerminal terminal;
+        private readonly IConsoleWriter console;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FailWriter"/> class.
         /// </summary>
-        /// <param name="terminal">The terminal.</param>
-        public FailWriter(ITerminal terminal)
+        /// <param name="console">The console.</param>
+        public FailWriter(IConsoleWriter console)
         {
-            this.terminal = terminal;
+            this.console = console;
         }
 
         /// <summary>
@@ -34,11 +34,11 @@ namespace AutoStep.CommandLine.Results
                     continue;
                 }
 
-                terminal.WriteFormatLine(ResultsMessages.Fail_Feature, feature.Feature.Name, feature.Feature.SourceName!);
+                console.WriteFormatLine(ResultsMessages.Fail_Feature, feature.Feature.Name, feature.Feature.SourceName!);
 
                 if (feature.FeatureFailureException is object)
                 {
-                    terminal.WriteErrorLine(ResultsMessages.Fail_FeatureException, 2);
+                    console.WriteErrorLine(ResultsMessages.Fail_FeatureException, 2);
                     RenderException(feature.FeatureFailureException, 2);
                 }
 
@@ -56,9 +56,9 @@ namespace AutoStep.CommandLine.Results
 
         private void WriteScenarioErrors(IScenarioResult scenario)
         {
-            terminal.WriteIndent(2);
-            terminal.Write(ResultsMessages.Bullet);
-            terminal.WriteLine(scenario.Scenario.Name);
+            console.WriteIndent(2);
+            console.Write(ResultsMessages.Bullet);
+            console.WriteLine(scenario.Scenario.Name);
 
             if (scenario.IsScenarioOutline)
             {
@@ -69,9 +69,9 @@ namespace AutoStep.CommandLine.Results
                         continue;
                     }
 
-                    terminal.WriteIndent(4);
-                    terminal.Write(ResultsMessages.Fail_InvokeBullet);
-                    terminal.WriteLine(invocation.InvocationName ?? ResultsMessages.Fail_AnonInvokeName);
+                    console.WriteIndent(4);
+                    console.Write(ResultsMessages.Fail_InvokeBullet);
+                    console.WriteLine(invocation.InvocationName ?? ResultsMessages.Fail_AnonInvokeName);
                     WriteInvocationError(invocation, 6);
                 }
             }
@@ -87,8 +87,8 @@ namespace AutoStep.CommandLine.Results
         {
             if (invocation.FailingStep is IStepReferenceInfo failingStep)
             {
-                terminal.WriteFormattedErrorLine(ResultsMessages.Fail_StepFailureOnLine, baseIndent, invocation.FailingStep.SourceLine);
-                terminal.WriteFormattedErrorLine(ResultsMessages.Fail_StepRef, baseIndent + 2, failingStep.Type, failingStep.Text);
+                console.WriteFormattedErrorLine(ResultsMessages.Fail_StepFailureOnLine, baseIndent, invocation.FailingStep.SourceLine);
+                console.WriteFormattedErrorLine(ResultsMessages.Fail_StepRef, baseIndent + 2, failingStep.Type, failingStep.Text);
 
                 if (invocation.OutlineVariables is object)
                 {
@@ -98,7 +98,7 @@ namespace AutoStep.CommandLine.Results
 
                         if (variableValue is object)
                         {
-                            terminal.WriteFormattedErrorLine(ResultsMessages.Fail_VariableDisplay, baseIndent + 4, arg, variableValue);
+                            console.WriteFormattedErrorLine(ResultsMessages.Fail_VariableDisplay, baseIndent + 4, arg, variableValue);
                         }
                     }
                 }
@@ -120,7 +120,7 @@ namespace AutoStep.CommandLine.Results
                 actualException = actualException.InnerException;
             }
 
-            terminal.WriteErrorLine(actualException.Message, indent);
+            console.WriteErrorLine(actualException.Message, indent);
         }
     }
 }
