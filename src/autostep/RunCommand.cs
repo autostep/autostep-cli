@@ -4,6 +4,7 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using AutoStep.CommandLine.Results;
 using AutoStep.Execution;
 using AutoStep.Execution.Results;
@@ -145,11 +146,6 @@ namespace AutoStep.CommandLine
 
                     // Register the exporter that writes the summary at the end of the run.
                     builder.RegisterInstance<IResultsExporter>(consoleResultsExporter);
-
-                    foreach (var ext in extensions.ExtensionEntryPoints)
-                    {
-                        ext.ConfigureExecutionServices(runConfig, builder);
-                    }
                 });
 
                 if (consoleResultsExporter.RunResults!.AllPassed)

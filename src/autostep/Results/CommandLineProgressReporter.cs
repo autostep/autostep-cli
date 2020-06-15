@@ -1,10 +1,8 @@
 ﻿using System;
-using System.CommandLine;
-using System.CommandLine.IO;
-using System.CommandLine.Rendering;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using AutoStep.CommandLine.Output;
 using AutoStep.Elements.Metadata;
 using AutoStep.Execution;
@@ -35,7 +33,7 @@ namespace AutoStep.CommandLine.Results
         }
 
         /// <inheritdoc/>
-        public override async ValueTask OnExecuteAsync(IServiceProvider scope, RunContext ctxt, Func<IServiceProvider, RunContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
+        public override async ValueTask OnExecuteAsync(ILifetimeScope scope, RunContext ctxt, Func<ILifetimeScope, RunContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var startTime = DateTime.UtcNow;
 
@@ -62,7 +60,7 @@ namespace AutoStep.CommandLine.Results
         }
 
         /// <inheritdoc/>
-        public override async ValueTask OnFeatureAsync(IServiceProvider scope, FeatureContext ctxt, Func<IServiceProvider, FeatureContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
+        public override async ValueTask OnFeatureAsync(ILifetimeScope scope, FeatureContext ctxt, Func<ILifetimeScope, FeatureContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var logConsumer = ctxt.GetLogConsumer();
 
@@ -95,11 +93,11 @@ namespace AutoStep.CommandLine.Results
         }
 
         /// <inheritdoc/>
-        public override async ValueTask OnScenarioAsync(IServiceProvider scope, ScenarioContext ctxt, Func<IServiceProvider, ScenarioContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
+        public override async ValueTask OnScenarioAsync(ILifetimeScope scope, ScenarioContext ctxt, Func<ILifetimeScope, ScenarioContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
             var logConsumer = ctxt.GetLogConsumer();
 
-            var featureContext = scope.GetRequiredService<FeatureContext>();
+            var featureContext = scope.Resolve<FeatureContext>();
 
             lock (consoleSync)
             {
@@ -168,9 +166,9 @@ namespace AutoStep.CommandLine.Results
         }
 
         /// <inheritdoc/>
-        public override async ValueTask OnStepAsync(IServiceProvider scope, StepContext ctxt, Func<IServiceProvider, StepContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
+        public override async ValueTask OnStepAsync(ILifetimeScope scope, StepContext ctxt, Func<ILifetimeScope, StepContext, CancellationToken, ValueTask> nextHandler, CancellationToken cancelToken)
         {
-            var scenarioContext = scope.GetRequiredService<ScenarioContext>();
+            var scenarioContext = scope.Resolve<ScenarioContext>();
 
             // Attach the log messages from the step context to the scenario.
             var logConsumer = ctxt.GetLogConsumer();
