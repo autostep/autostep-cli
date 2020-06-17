@@ -103,18 +103,7 @@ namespace AutoStep.CommandLine.Results
             {
                 if (ctxt.Scenario is IScenarioOutlineInfo outline)
                 {
-                    var variables = (TableVariableSet)ctxt.Variables;
-
-                    var invokeName = DetermineInvocationName(outline, variables);
-
-                    if (invokeName is null)
-                    {
-                        invokeName = "no name";
-                    }
-                    else if (invokeName.Length > 30)
-                    {
-                        invokeName = invokeName.Substring(0, 30) + "...";
-                    }
+                    var invokeName = GetInvocationName(ctxt, outline);
 
                     console.WriteLine(ResultsMessages.StartingScenarioInvocation.FormatWith(ctxt.Scenario.Name, invokeName, featureContext.Feature.Name), 2);
                 }
@@ -138,7 +127,16 @@ namespace AutoStep.CommandLine.Results
 
                     if (ctxt.FailException is object)
                     {
-                        console.WriteErrorLine(ResultsMessages.ScenarioFailed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
+                        if (ctxt.Scenario is IScenarioOutlineInfo outline)
+                        {
+                            var invokeName = GetInvocationName(ctxt, outline);
+
+                            console.WriteLine(ResultsMessages.ScenarioInvocationFailed.FormatWith(ctxt.Scenario.Name, invokeName, ctxt.Elapsed.Humanize()), 2);
+                        }
+                        else
+                        {
+                            console.WriteErrorLine(ResultsMessages.ScenarioFailed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
+                        }
 
                         if (ctxt.FailException is StepFailureException failure)
                         {
@@ -157,12 +155,36 @@ namespace AutoStep.CommandLine.Results
                             console.WriteErrorLine(ResultsMessages.FailingStep.FormatWith(stepText, ctxt.FailingStep.SourceLine), 4);
                         }
                     }
+                    else if (ctxt.Scenario is IScenarioOutlineInfo outline)
+                    {
+                        var invokeName = GetInvocationName(ctxt, outline);
+
+                        console.WriteLine(ResultsMessages.ScenarioInvocationPassed.FormatWith(ctxt.Scenario.Name, invokeName, ctxt.Elapsed.Humanize()), 2);
+                    }
                     else
                     {
                         console.WriteSuccessLine(ResultsMessages.ScenarioPassed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
                     }
                 }
             }
+        }
+
+        private string GetInvocationName(ScenarioContext ctxt, IScenarioOutlineInfo outline)
+        {
+            var variables = (TableVariableSet)ctxt.Variables;
+
+            var invokeName = DetermineInvocationName(outline, variables);
+
+            if (invokeName is null)
+            {
+                invokeName = "no name";
+            }
+            else if (invokeName.Length > 30)
+            {
+                invokeName = invokeName.Substring(0, 30) + "...";
+            }
+
+            return invokeName;
         }
 
         /// <inheritdoc/>

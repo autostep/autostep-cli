@@ -189,6 +189,12 @@
   <data name="ScenarioFailed" xml:space="preserve">
     <value>Scenario "{0}" failed after {1}.</value>
   </data>
+  <data name="ScenarioInvocationFailed" xml:space="preserve">
+    <value>Scenario "{0}" [{1}] failed after {2}.</value>
+  </data>
+  <data name="ScenarioInvocationPassed" xml:space="preserve">
+    <value>Scenario "{0}" [{1}] passed after {2}.</value>
+  </data>
   <data name="ScenarioPassed" xml:space="preserve">
     <value>Scenario "{0}" passed after {1}.</value>
   </data>

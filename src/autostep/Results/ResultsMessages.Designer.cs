@@ -277,6 +277,24 @@ namespace AutoStep.CommandLine.Results {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Scenario &quot;{0}&quot; [{1}] failed after {2}..
+        /// </summary>
+        internal static string ScenarioInvocationFailed {
+            get {
+                return ResourceManager.GetString("ScenarioInvocationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scenario &quot;{0}&quot; [{1}] passed after {2}..
+        /// </summary>
+        internal static string ScenarioInvocationPassed {
+            get {
+                return ResourceManager.GetString("ScenarioInvocationPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Scenario &quot;{0}&quot; passed after {1}..
         /// </summary>
         internal static string ScenarioPassed {
