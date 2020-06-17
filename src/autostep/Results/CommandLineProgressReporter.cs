@@ -131,7 +131,7 @@ namespace AutoStep.CommandLine.Results
                         {
                             var invokeName = GetInvocationName(ctxt, outline);
 
-                            console.WriteLine(ResultsMessages.ScenarioInvocationFailed.FormatWith(ctxt.Scenario.Name, invokeName, ctxt.Elapsed.Humanize()), 2);
+                            console.WriteErrorLine(ResultsMessages.ScenarioInvocationFailed.FormatWith(ctxt.Scenario.Name, invokeName, ctxt.Elapsed.Humanize()), 2);
                         }
                         else
                         {
@@ -159,7 +159,7 @@ namespace AutoStep.CommandLine.Results
                     {
                         var invokeName = GetInvocationName(ctxt, outline);
 
-                        console.WriteLine(ResultsMessages.ScenarioInvocationPassed.FormatWith(ctxt.Scenario.Name, invokeName, ctxt.Elapsed.Humanize()), 2);
+                        console.WriteSuccessLine(ResultsMessages.ScenarioInvocationPassed.FormatWith(ctxt.Scenario.Name, invokeName, ctxt.Elapsed.Humanize()), 2);
                     }
                     else
                     {
