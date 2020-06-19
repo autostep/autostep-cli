@@ -33,7 +33,7 @@
   
     <ItemGroup>
         <PackageReference Include="AutoStep" Version="1.0.0-develop.327" />
-        <PackageReference Include="AutoStep.Extensions" Version="1.0.0-develop.68" />
+        <PackageReference Include="AutoStep.Extensions" Version="1.0.0-develop.70" />
         <PackageReference Include="Humanizer" Version="2.8.26" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.3" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.3" />
