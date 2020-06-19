@@ -123,8 +123,6 @@ namespace AutoStep.CommandLine.Results
             {
                 lock (consoleSync)
                 {
-                    RenderLogs(logConsumer, 4);
-
                     if (ctxt.FailException is object)
                     {
                         if (ctxt.Scenario is IScenarioOutlineInfo outline)
@@ -164,6 +162,13 @@ namespace AutoStep.CommandLine.Results
                     else
                     {
                         console.WriteSuccessLine(ResultsMessages.ScenarioPassed.FormatWith(ctxt.Scenario.Name, ctxt.Elapsed.Humanize()), 2);
+                    }
+
+                    if (logConsumer.AnyEntries)
+                    {
+                        console.WriteLine(ResultsMessages.Logs, 4);
+
+                        RenderLogs(logConsumer, 6);
                     }
                 }
             }

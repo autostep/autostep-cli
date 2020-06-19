@@ -180,6 +180,9 @@
   <data name="Heading_TestResults" xml:space="preserve">
     <value>Test Results</value>
   </data>
+  <data name="Logs" xml:space="preserve">
+    <value>Logs:</value>
+  </data>
   <data name="NumberOfFeaturesPassed" xml:space="preserve">
     <value>/{0} features passed.</value>
   </data>
